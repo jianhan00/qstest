@@ -2,326 +2,230 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>大乘起信論｜刷題小程式 v1.1（支援 Excel 匯入）</title>
-  <!-- 解析 Excel 用：SheetJS（可離線改成本機檔） -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.1, maximum-scale=1.1" />
+  <title>大乘起信論｜刷題小程式 v1.3（解析加大版）</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
-    :root{ --bg:#0b1220; --card:#0f172a; --ink:#e2e8f0; --muted:#94a3b8; --brand:#38bdf8; --accent:#22c55e; --danger:#f43f5e; }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,"Noto Sans TC",sans-serif;background:linear-gradient(180deg,#0b1220,#0a1020);color:var(--ink)}
-    .wrap{max-width:980px;margin:24px auto;padding:20px}
+    :root{
+      --bg:#0b1220;--card:#0f172a;--ink:#e2e8f0;
+      --muted:#94a3b8;--brand:#38bdf8;--accent:#22c55e;--danger:#f43f5e;
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,"Noto Sans TC",sans-serif;
+      background:linear-gradient(180deg,#0b1220,#0a1020);
+      color:var(--ink);
+    }
+    .wrap{max-width:960px;margin:24px auto;padding:20px}
     .title{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
     .title h1{font-size:24px;margin:0}
     .card{background:var(--card);border:1px solid #1f2937;border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
-    .row{display:flex;gap:12px;flex-wrap:wrap}
-    .grow{flex:1 1 220px}
     label{font-size:13px;color:var(--muted)}
-    select,button,input[type="number"],input[type="url"]{padding:8px 10px;border-radius:10px;border:1px solid #334155;background:#0b1220;color:var(--ink)}
+    select,button,input[type="number"],input[type="url"]{
+      padding:8px 10px;border-radius:10px;border:1px solid #334155;background:#0b1220;color:var(--ink)
+    }
     button{cursor:pointer}
     .btn{background:#0b1328;border:1px solid #2c3e50}
     .btn:hover{border-color:#64748b}
     .btn.brand{border-color:#0ea5e9;background:#0b1b2e}
     .btn.good{border-color:#22c55e}
     .btn.bad{border-color:#f43f5e}
-    .stat{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-    .kpi{background:#0b1328;border:1px solid #233142;border-radius:12px;padding:10px}
-    .kpi b{display:block;font-size:20px}
-    .qno{font-size:13px;color:var(--muted)}
-    .question{font-size:20px;line-height:1.6;margin:6px 0 10px}
-    .opt{display:flex;align-items:flex-start;gap:10px;border:1px solid #1f2937;background:#0b1328;border-radius:12px;padding:10px;margin:8px 0}
-    .opt input{margin-top:4px}
-    .opt.correct{border-color:var(--accent)}
-    .opt.wrong{border-color:var(--danger)}
-    .tags{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 2px}
-    .tag{font-size:12px;color:#0b1220;background:#a5f3fc;border:0;border-radius:999px;padding:4px 8px}
-    .controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
     .note{color:var(--muted);font-size:12px}
-    details{margin-top:10px}
     .hidden{display:none}
-    .flex{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .pill{padding:6px 10px;border-radius:999px;border:1px solid #334155;background:#0b1328}
-    .pill input{width:70px}
-    .footer{opacity:.8;font-size:12px;margin-top:20px}
-    .list{list-style:none;padding-left:16px}
-    .list li{margin:8px 0}
-    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+    .tag{font-size:12px;color:#0b1220;background:#a5f3fc;border-radius:999px;padding:4px 8px}
+    .footer{opacity:.8;font-size:12px;margin-top:20px;text-align:center;}
+
+    /* 📱 手機舒適閱讀加強 */
+    .question {
+      font-size: clamp(22px, 3.5vw, 28px);
+      line-height: 1.9;
+      margin: 12px 0 16px;
+      font-weight: 600;
+    }
+    .opt {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      border: 1px solid #1f2937;
+      background: #0b1328;
+      border-radius: 14px;
+      padding: 16px 14px;
+      margin: 12px 0;
+      font-size: clamp(19px, 3vw, 23px);
+      line-height: 1.7;
+    }
+    #expBox {
+      font-size: clamp(18px, 2.8vw, 22px);
+      line-height: 1.9;
+      background: #101828;
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-top: 12px;
+    }
+    #expBox p {
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    #expBox .note {
+      color:#cbd5e1;
+      font-size: clamp(17px, 2.6vw, 21px);
+      line-height: 1.8;
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="title">
-      <h1>《大乘起信論》刷題小程式 <span class="note">— v1.1 支援 Excel（.xlsx）匯入題庫</span></h1>
+      <h1>《大乘起信論》刷題小程式 <span class="note">— v1.3 解析加大版</span></h1>
     </div>
 
-    <!-- 設定區 -->
     <div class="card" id="panel-setup">
-      <div class="row">
-        <div class="grow">
-          <label>題目來源</label>
-          <div class="flex">
-            <select id="sourceSel">
-              <option value="builtin">內建示例題庫（可修改）</option>
-              <option value="upload">從電腦上傳 JSON 題庫</option>
-              <option value="excel">從 Excel 匯入（.xlsx）</option>
-              <option value="url">輸入遠端 JSON 連結</option>
-            </select>
-            <input type="file" id="filePickerJson" accept="application/json" class="hidden" />
-            <input type="file" id="filePickerXlsx" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xlsx" class="hidden" />
-            <input type="url" id="urlInput" class="hidden" placeholder="https://…/questions.json" style="width:260px"/>
-            <button class="btn" id="btnLoad">載入題庫</button>
-          </div>
-          <div class="note">
-            JSON 格式：[{"id":1,"section":"總說","question":"……?","options":["A","B","C","D"],"answer":1,"explanation":"可省略"}]；
-            Excel 欄位：id, section, question, optionA, optionB, optionC, optionD, answer(如 A 或 A,C), explanation。
-          </div>
-        </div>
-        <div>
-          <label>出題模式</label>
-          <select id="modeSel">
-            <option value="order">依順序</option>
-            <option value="shuffle">隨機</option>
-            <option value="all">全部</option>
-          </select>
-        </div>
-        <div class="pill">
-          <label>題數</label>
-          <input type="number" id="countInp" min="1" max="200" value="10">
-        </div>
-        <div>
-          <label>&nbsp;</label><br>
-          <button class="btn brand" id="btnStart">開始作答 ▶</button>
-        </div>
+      <label>題庫來源</label><br>
+      <select id="sourceSel">
+        <option value="builtin">內建示例題庫</option>
+        <option value="upload">上傳 JSON 題庫</option>
+        <option value="excel">上傳 Excel (.xlsx)</option>
+        <option value="url">輸入遠端 JSON 連結</option>
+      </select>
+      <input type="file" id="filePickerJson" accept="application/json" class="hidden"/>
+      <input type="file" id="filePickerXlsx" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xlsx" class="hidden"/>
+      <input type="url" id="urlInput" class="hidden" placeholder="https://…/questions.json" style="width:260px"/>
+      <button class="btn" id="btnLoad">載入題庫</button>
+      <div class="note">
+        JSON 格式：[{"id":1,"section":"總說","question":"……?","options":["A","B","C","D"],"answer":1,"explanation":"可省略"}]
       </div>
+      <hr>
+      <label>出題數量</label><br>
+      <input type="number" id="countInp" min="1" max="200" value="10"><br><br>
+      <button class="btn brand" id="btnStart">開始作答 ▶</button>
     </div>
 
-    <!-- 統計區 -->
-    <div class="card" id="panel-stat" style="display:none">
-      <div class="stat">
-        <div class="kpi"><span>總題數</span><b id="stat-total">0</b></div>
-        <div class="kpi"><span>已作答</span><b id="stat-done">0</b></div>
-        <div class="kpi"><span>答對數</span><b id="stat-correct">0</b></div>
-        <div class="kpi"><span>正確率</span><b id="stat-acc">0%</b></div>
-      </div>
-      <div class="controls">
-        <button class="btn" id="btnPrev">← 上一題</button>
-        <button class="btn" id="btnShow">顯示/隱藏 答案</button>
-        <button class="btn" id="btnNext">下一題 →</button>
-        <button class="btn good" id="btnFinish">結束並看錯題</button>
-        <button class="btn bad" id="btnReset">重新開始</button>
-      </div>
-    </div>
-
-    <!-- 題目區 -->
     <div class="card" id="panel-quiz" style="display:none">
-      <div class="tags" id="qTags"></div>
-      <div class="qno" id="qNo">第 1 / 1 題</div>
-      <div class="question" id="qText">……</div>
+      <div id="qTags"></div>
+      <div id="qNo"></div>
+      <div class="question" id="qText"></div>
       <div id="optBox"></div>
       <details id="expBox" open>
         <summary>解析 / 正解</summary>
         <div id="exp"></div>
       </details>
+      <div style="margin-top:10px;">
+        <button class="btn" id="btnPrev">← 上一題</button>
+        <button class="btn" id="btnShow">顯示/隱藏 答案</button>
+        <button class="btn" id="btnNext">下一題 →</button>
+      </div>
     </div>
-
-    <!-- 錯題回顧 -->
-    <div class="card" id="panel-review" style="display:none">
-      <h3>錯題回顧</h3>
-      <ol id="revList" class="list"></ol>
-    </div>
-
-    <div class="footer">© 2025 刷題小程式 v1.1 — 純前端單檔，支援 JSON 與 Excel 題庫，上 GitHub Pages 即可使用。</div>
+    <div class="footer">© 2025 刷題小程式 v1.3 — 支援 JSON 與 Excel 題庫</div>
   </div>
 
   <script>
-    // ====== 內建示例題庫 ======
-    const BUILTIN = [
-      { id:1, section:"總說", question:"《大乘起信論》依什麼雙門立論以統攝教義？", options:["心真如門與心生滅門","空門與假門","因門與果門","性門與相門"], answer:0, explanation:"本論以『心真如門』『心生滅門』二門統攝一切法。" },
-      { id:2, section:"總說", question:"本論所說『一心二門』中，生滅因依於何者而起？", options:["依於無明自體","依於如來藏真如","依於業力","依於阿賴耶識"], answer:1, explanation:"生滅門不離真如而起，喻如波依水。" },
-      { id:3, section:"五重玄義", question:"作者馬鳴菩薩立論之宗旨，最核心在顯示什麼？", options:["唯識無境","真如不變隨緣","空假中三觀","戒定慧三學"], answer:1, explanation:"宗旨在『不變隨緣』以會通有無，令歸一心。" },
-      { id:4, section:"因緣分", question:"眾生何以久處生死？", options:["外道誤導","無始無明熏習","神祇作祟","天命使然"], answer:1, explanation:"本論明言『無始無明』為流轉根本。" },
-      { id:5, section:"修行分", question:"止觀雙修之『止』，依本論義理當下何義？", options:["遣除一切念頭","安住真如理","觀察諸法因緣","持咒念佛"], answer:1, explanation:"止即住於真如，觀則緣起觀照，兩者相資成就。" }
+    const BUILTIN=[
+      {id:1,section:"總說",question:"《大乘起信論》依什麼雙門立論以統攝教義？",options:["心真如門與心生滅門","空門與假門","因門與果門","性門與相門"],answer:0,explanation:"本論以『心真如門』『心生滅門』二門統攝一切法。"},
+      {id:2,section:"總說",question:"本論所說『一心二門』中，生滅因依於何者而起？",options:["依於無明自體","依於如來藏真如","依於業力","依於阿賴耶識"],answer:1,explanation:"生滅門不離真如而起，喻如波依水。"},
+      {id:3,section:"五重玄義",question:"作者馬鳴菩薩立論之宗旨，最核心在顯示什麼？",options:["唯識無境","真如不變隨緣","空假中三觀","戒定慧三學"],answer:1,explanation:"宗旨在『不變隨緣』以會通有無，令歸一心。"}
     ];
 
-    // ====== 狀態 ======
-    let bank = [];
-    let paper = [];
-    let idx = 0;
-    let userAns = {};
-    let showAnswer = false;
+    const $=s=>document.querySelector(s);
+    let bank=[],idx=0,paper=[],userAns={},showAnswer=false;
+    const ABC={A:0,B:1,C:2,D:3};
+    const isArray=Array.isArray;
 
-    // ====== 小工具 ======
-    const $ = sel => document.querySelector(sel);
-    function shuffle(arr){ return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]); }
-    const isArray = Array.isArray;
-    const ABC = {A:0,B:1,C:2,D:3};
-    function normalizeAnswer(a){ if(a==null) return []; if(isArray(a)) return [...a].sort((x,y)=>x-y); return [a]; }
-    function sameArray(a,b){ a = normalizeAnswer(a); b = normalizeAnswer(b); if(a.length!==b.length) return false; return a.every((v,i)=>v===b[i]); }
+    function normalizeAnswer(a){if(a==null)return[];if(isArray(a))return[...a].sort((x,y)=>x-y);return[a];}
+    function sameArray(a,b){a=normalizeAnswer(a);b=normalizeAnswer(b);if(a.length!==b.length)return false;return a.every((v,i)=>v===b[i]);}
+    function shuffle(arr){return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);}
 
-    // ====== 題庫載入 ======
-    const sourceSel = $('#sourceSel');
-    const filePickerJson = $('#filePickerJson');
-    const filePickerXlsx = $('#filePickerXlsx');
-    const urlInput = $('#urlInput');
-
-    sourceSel.addEventListener('change',()=>{
-      const v = sourceSel.value;
-      filePickerJson.classList.toggle('hidden', v!== 'upload');
-      filePickerXlsx.classList.toggle('hidden', v!== 'excel');
-      urlInput.classList.toggle('hidden', v!== 'url');
-    });
-
-    $('#btnLoad').addEventListener('click', async()=>{
+    $('#btnLoad').addEventListener('click',async()=>{
       try{
-        const mode = sourceSel.value;
-        if(mode==='builtin'){
-          bank = JSON.parse(JSON.stringify(BUILTIN));
-        }else if(mode==='upload'){
-          filePickerJson.click(); return;
-        }else if(mode==='excel'){
-          filePickerXlsx.click(); return;
-        }else if(mode==='url'){
-          const url = urlInput.value.trim(); if(!url) return alert('請輸入 JSON 連結');
-          const res = await fetch(url); bank = await res.json();
-        }
-        if(mode!=='upload' && mode!=='excel') alert(`載入完成：${bank.length} 題`);
-      }catch(e){ alert('載入失敗：'+e.message); }
+        const mode=$('#sourceSel').value;
+        if(mode==='builtin'){bank=JSON.parse(JSON.stringify(BUILTIN));alert(`載入完成：${bank.length}題`);}
+        else if(mode==='upload'){$('#filePickerJson').click();return;}
+        else if(mode==='excel'){$('#filePickerXlsx').click();return;}
+        else if(mode==='url'){const url=$('#urlInput').value.trim();if(!url)return alert('請輸入連結');const res=await fetch(url);bank=await res.json();alert(`載入完成：${bank.length}題`);}
+      }catch(e){alert('載入失敗:'+e.message);}
     });
 
-    filePickerJson.addEventListener('change', async(e)=>{
-      const f = e.target.files?.[0]; if(!f) return;
-      const txt = await f.text();
-      try{ bank = JSON.parse(txt); alert(`載入完成：${bank.length} 題`);}catch(err){ alert('JSON 解析失敗'); }
+    $('#filePickerJson').addEventListener('change',async(e)=>{
+      const f=e.target.files?.[0];if(!f)return;
+      try{const txt=await f.text();bank=JSON.parse(txt);alert(`載入完成：${bank.length}題`);}catch(err){alert('JSON 解析失敗');}
     });
 
-    filePickerXlsx.addEventListener('change', async(e)=>{
-      const f = e.target.files?.[0]; if(!f) return;
-      const reader = new FileReader();
-      reader.onload = (evt)=>{
+    $('#filePickerXlsx').addEventListener('change',async(e)=>{
+      const f=e.target.files?.[0];if(!f)return;
+      const reader=new FileReader();
+      reader.onload=(evt)=>{
         try{
-          const data = new Uint8Array(evt.target.result);
-          const wb = XLSX.read(data, {type:'array'});
-          const ws = wb.Sheets[wb.SheetNames[0]]; // 用第一個工作表
-          const rows = XLSX.utils.sheet_to_json(ws, {defval:''});
-          bank = rows.map((r,i)=>{
-            const opts = [r.optionA, r.optionB, r.optionC, r.optionD].filter(x=>x!==undefined && x!=='');
-            let ans = String(r.answer||'').split(',').map(s=>s.trim().toUpperCase()).filter(Boolean).map(a=>ABC[a]).filter(x=>x!==undefined);
-            if(ans.length===1) ans = ans[0];
-            return {
-              id: Number(r.id||i+1),
-              section: String(r.section||''),
-              question: String(r.question||''),
-              options: opts,
-              answer: ans,
-              explanation: String(r.explanation||'')
-            };
+          const data=new Uint8Array(evt.target.result);
+          const wb=XLSX.read(data,{type:'array'});
+          const ws=wb.Sheets[wb.SheetNames[0]];
+          const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+          bank=rows.map((r,i)=>{
+            const opts=[r.optionA,r.optionB,r.optionC,r.optionD].filter(x=>x);
+            let ans=String(r.answer||'').split(',').map(s=>s.trim().toUpperCase()).map(a=>ABC[a]).filter(x=>x!==undefined);
+            if(ans.length===1)ans=ans[0];
+            return{id:Number(r.id||i+1),section:String(r.section||''),question:String(r.question||''),options:opts,answer:ans,explanation:String(r.explanation||'')};
           });
-          alert(`Excel 匯入完成：${bank.length} 題`);
-        }catch(err){ alert('Excel 解析失敗：'+err.message); }
+          alert(`Excel 匯入完成：${bank.length}題`);
+        }catch(err){alert('Excel 解析失敗:'+err.message);}
       };
       reader.readAsArrayBuffer(f);
     });
 
-    // ====== 開始作答 ======
     $('#btnStart').addEventListener('click',()=>{
-      if(!bank.length){ if(confirm('尚未載入題庫，是否改用內建示例？')) bank = JSON.parse(JSON.stringify(BUILTIN)); else return; }
-      const mode = $('#modeSel').value;
-      const want = Math.max(1, Math.min(200, parseInt($('#countInp').value||'10',10)));
-      const allIdx = bank.map((_,i)=>i);
-      let list = (mode==='shuffle')? shuffle(allIdx): allIdx;
-      if(mode!=='all') list = list.slice(0, want);
-      paper = list; idx = 0; userAns = {}; showAnswer=false;
+      if(!bank.length){if(confirm('尚未載入題庫，是否改用內建示例？'))bank=JSON.parse(JSON.stringify(BUILTIN));else return;}
+      const want=parseInt($('#countInp').value||'10',10);
+      paper=shuffle(bank.map((_,i)=>i)).slice(0,want);
+      idx=0;userAns={};showAnswer=false;
       $('#panel-setup').style.display='none';
-      $('#panel-stat').style.display='block';
       $('#panel-quiz').style.display='block';
-      $('#panel-review').style.display='none';
       render();
     });
 
-    // ====== 導航 & 動作 ======
-    $('#btnPrev').addEventListener('click',()=>{ if(idx>0){ idx--; render(); }});
-    $('#btnNext').addEventListener('click',()=>{ if(idx<paper.length-1){ idx++; render(); }});
-    $('#btnShow').addEventListener('click',()=>{ showAnswer=!showAnswer; render(); });
-    $('#btnReset').addEventListener('click',()=>{ location.reload(); });
-    $('#btnFinish').addEventListener('click',()=>{ reviewWrong(); });
+    $('#btnPrev').addEventListener('click',()=>{if(idx>0){idx--;render();}});
+    $('#btnNext').addEventListener('click',()=>{if(idx<paper.length-1){idx++;render();}});
+    $('#btnShow').addEventListener('click',()=>{showAnswer=!showAnswer;render();});
 
     function render(){
-      const q = bank[paper[idx]]; if(!q) return;
-      $('#qNo').textContent = `第 ${idx+1} / ${paper.length} 題`;
-      $('#qText').textContent = q.question || '';
-      const tagBox = $('#qTags'); tagBox.innerHTML='';
-      if(q.section){ const s=document.createElement('span'); s.className='tag'; s.textContent=q.section; tagBox.appendChild(s); }
-
-      const box = $('#optBox'); box.innerHTML='';
-      const cur = userAns[q.id];
-      const correct = normalizeAnswer(q.answer);
-      const isMulti = correct.length>1;
-
-      (q.options||[]).forEach((opt, i)=>{
-        const row = document.createElement('label'); row.className='opt';
-        const ip = document.createElement('input'); ip.type = isMulti? 'checkbox':'radio'; ip.name='opt'; ip.value=i;
-        if(isMulti && isArray(cur) && cur.includes(i)) ip.checked=true;
-        if(!isMulti && cur===i) ip.checked=true;
+      const q=bank[paper[idx]];if(!q)return;
+      $('#qNo').textContent=`第 ${idx+1} / ${paper.length} 題`;
+      $('#qText').textContent=q.question;
+      const tagBox=$('#qTags');tagBox.innerHTML=q.section?`<span class="tag">${q.section}</span>`:'';
+      const box=$('#optBox');box.innerHTML='';
+      const correct=normalizeAnswer(q.answer);const cur=userAns[q.id];
+      const isMulti=correct.length>1;
+      q.options.forEach((opt,i)=>{
+        const row=document.createElement('label');row.className='opt';
+        const ip=document.createElement('input');ip.type=isMulti?'checkbox':'radio';ip.name='opt';ip.value=i;
+        if(isMulti&&isArray(cur)&&cur.includes(i))ip.checked=true;if(!isMulti&&cur===i)ip.checked=true;
         ip.addEventListener('change',()=>{
-          if(isMulti){
-            const now = new Set(isArray(userAns[q.id])? userAns[q.id]:[]);
-            if(ip.checked) now.add(i); else now.delete(i);
-            userAns[q.id] = [...now].sort((a,b)=>a-b);
-          }else{ userAns[q.id] = i; }
-          updateStat(); renderExplain(q); markOptions();
+          if(isMulti){const now=new Set(isArray(userAns[q.id])?userAns[q.id]:[]);if(ip.checked)now.add(i);else now.delete(i);userAns[q.id]=[...now].sort((a,b)=>a-b);}
+          else userAns[q.id]=i;
+          renderExplain(q);markOptions();
         });
-        const text = document.createElement('div'); text.innerHTML = `<b>${String.fromCharCode(65+i)}.</b> ${opt}`;
-        row.appendChild(ip); row.appendChild(text); box.appendChild(row);
+        const text=document.createElement('div');text.innerHTML=`<b>${String.fromCharCode(65+i)}.</b> ${opt}`;
+        row.appendChild(ip);row.appendChild(text);box.appendChild(row);
       });
-
+      renderExplain(q);markOptions();
       function markOptions(){
-        const rows = box.querySelectorAll('.opt');
+        const rows=box.querySelectorAll('.opt');
         rows.forEach((row,i)=>{
           row.classList.remove('correct','wrong');
           if(showAnswer){
-            if(correct.includes(i)) row.classList.add('correct');
-            else if((isArray(userAns[q.id]) && userAns[q.id].includes(i)) || userAns[q.id]===i) row.classList.add('wrong');
-          }
+            if(correct.includes(i))row.style.borderColor='#22c55e';
+            else if((isArray(userAns[q.id])&&userAns[q.id].includes(i))||userAns[q.id]===i)
+              row.style.borderColor='#f43f5e';
+            else row.style.borderColor='#1f2937';
+          }else row.style.borderColor='#1f2937';
         });
       }
-
-      renderExplain(q); markOptions(); updateStat();
     }
 
     function renderExplain(q){
-      const exp = $('#expBox');
-      const dst = $('#exp');
-      const cur = userAns[q.id];
-      const correct = normalizeAnswer(q.answer);
-      const label = correct.map(i=>String.fromCharCode(65+i)).join(', ');
-      const isRight = sameArray(cur, correct);
-      dst.innerHTML = `<p>正確答案：<b>${label||'（未設定）'}</b> ${isRight? '✅': (cur==null?'':'❌')}</p>` + (q.explanation? `<div class="note">${q.explanation}</div>`: '<div class="note">（此題暫無解析）</div>');
-      exp.open = true;
-    }
-
-    function updateStat(){
-      const total = paper.length;
-      const done = Object.keys(userAns).length;
-      let right = 0; paper.forEach(i=>{ const q=bank[i]; if(sameArray(userAns[q.id], q.answer)) right++; });
-      $('#stat-total').textContent = total;
-      $('#stat-done').textContent = done;
-      $('#stat-correct').textContent = right;
-      $('#stat-acc').textContent = total? Math.round(right/total*100)+"%" : '0%';
-    }
-
-    function reviewWrong(){
-      const wrong = [];
-      paper.forEach(i=>{ const q=bank[i]; if(!sameArray(userAns[q.id], q.answer)) wrong.push(q); });
-      const list = $('#revList'); list.innerHTML='';
-      wrong.forEach((q)=>{
-        const li = document.createElement('li');
-        const ans = normalizeAnswer(q.answer).map(i=>String.fromCharCode(65+i)).join(', ');
-        li.innerHTML = `<div><span class="tag">${q.section||'題目'}</span> <b>${q.question}</b></div>
-                        <div class="note">正解：${ans}；${q.explanation||'無解析'}</div>`;
-        list.appendChild(li);
-      });
-      $('#panel-review').style.display='block';
-      window.scrollTo({top:document.body.scrollHeight, behavior:'smooth'});
+      const dst=$('#exp');
+      const correct=normalizeAnswer(q.answer);
+      const label=correct.map(i=>String.fromCharCode(65+i)).join(', ');
+      const cur=userAns[q.id];
+      const isRight=sameArray(cur,correct);
+      dst.innerHTML=`<p>正確答案：<b>${label}</b> ${isRight?'✅':cur==null?'':'❌'}</p>`+(q.explanation?`<div class="note">${q.explanation}</div>`:'');
     }
   </script>
 </body>
