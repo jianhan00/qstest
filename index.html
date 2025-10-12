@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>大乘起信論｜刷題小程式 v1.4（緊湊舒適版）</title>
+  <title>大乘起信論｜刷題小程式 v1.5（緊湊進階版）</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     :root{
@@ -16,9 +16,9 @@
       background:linear-gradient(180deg,#0b1220,#0a1020);
       color:var(--ink);
     }
-    .wrap{max-width:960px;margin:12px auto;padding:12px}
+    .wrap{max-width:960px;margin:10px auto;padding:10px}
     .title h1{font-size:22px;margin:0}
-    .card{background:var(--card);border:1px solid #1f2937;border-radius:14px;padding:14px;box-shadow:0 8px 20px rgba(0,0,0,.25)}
+    .card{background:var(--card);border:1px solid #1f2937;border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
     select,button,input[type="number"],input[type="url"]{
       padding:6px 8px;border-radius:8px;border:1px solid #334155;background:#0b1220;color:var(--ink)
     }
@@ -30,41 +30,41 @@
     .tag{font-size:12px;color:#0b1220;background:#a5f3fc;border-radius:999px;padding:3px 6px}
     .footer{opacity:.7;font-size:11px;margin-top:10px;text-align:center;}
 
-    /* 📱 緊湊閱讀模式 */
+    /* 📱 緊湊進階模式 */
     .question {
-      font-size: clamp(18px, 3vw, 22px);
+      font-size: clamp(18px, 3vw, 21px);
       line-height: 1.6;
-      margin: 6px 0 8px;
+      margin: 4px 0 6px;
       font-weight: 600;
     }
     .opt {
       display:flex;
       align-items:flex-start;
-      gap:8px;
+      gap:6px;
       border:1px solid #1f2937;
       background:#0b1328;
-      border-radius:10px;
-      padding:8px 10px;
-      margin:6px 0;
-      font-size: clamp(16px, 2.6vw, 20px);
-      line-height:1.5;
+      border-radius:9px;
+      padding:6px 8px;
+      margin:3px 0;           /* ← 比前版再縮 0.3 公分（約 3px） */
+      font-size: clamp(16px, 2.5vw, 19px);
+      line-height:1.45;
     }
     #expBox {
-      font-size: clamp(15px, 2.5vw, 19px);
-      line-height:1.6;
+      font-size: clamp(15px, 2.4vw, 18px);
+      line-height:1.5;
       background:#101828;
-      border-radius:10px;
-      padding:10px 12px;
-      margin-top:6px;
+      border-radius:9px;
+      padding:8px 10px;
+      margin-top:5px;
     }
     #expBox p { margin-bottom:4px; font-weight:600; }
-    #expBox .note { color:#cbd5e1; font-size: clamp(14px, 2.4vw, 18px); line-height:1.5; }
+    #expBox .note { color:#cbd5e1; font-size: clamp(14px, 2.3vw, 17px); line-height:1.45; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="title">
-      <h1>《大乘起信論》刷題小程式 <span class="note">— v1.4 緊湊舒適版</span></h1>
+      <h1>《大乘起信論》刷題小程式 <span class="note">— v1.5 緊湊進階版</span></h1>
     </div>
 
     <div class="card" id="panel-setup">
@@ -104,7 +104,7 @@
       </div>
     </div>
 
-    <div class="footer">© 2025 刷題小程式 v1.4 — JSON/Excel 題庫支援</div>
+    <div class="footer">© 2025 刷題小程式 v1.5 — JSON/Excel 題庫支援</div>
   </div>
 
   <script>
