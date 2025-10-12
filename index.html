@@ -2,288 +2,314 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-<title>大乘起信論｜刷題小程式 v2.1（單一上傳＋重置＋即時回饋）</title>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>大乘起信論 線上刷題</title>
 <style>
-:root{--bg:#0b1220;--card:#0f172a;--ink:#e2e8f0;--muted:#94a3b8;
---brand:#38bdf8;--accent:#22c55e;--danger:#f43f5e;--border:#1f2937;}
-*{box-sizing:border-box;}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans TC",sans-serif;background:#0b1220;color:var(--ink);}
-.wrap{max-width:960px;margin:10px auto;padding:10px}
-.title h1{font-size:22px;margin:0}
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
-label{font-size:13px;color:var(--muted)}
-select,button,input[type="number"],input[type="url"],input[type="file"]{padding:6px 8px;border-radius:8px;border:1px solid #334155;background:#0b1220;color:var(--ink)}
-button{cursor:pointer}
-.btn{background:#0b1328;border:1px solid #2c3e50}
-.btn:hover{border-color:#64748b}
-.btn.brand{border-color:#0ea5e9;background:#0b1b2e}
-.btn.reset{border-color:#f59e0b;background:#1f1605}
-.note{color:var(--muted);font-size:12px}
-.tag{font-size:12px;color:#0b1220;background:#a5f3fc;border-radius:999px;padding:3px 6px}
-.footer{opacity:.7;font-size:11px;margin-top:10px;text-align:center}
-.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+:root{
+  --bg:#f6f7fb; --card:#ffffff; --ink:#0f172a; --muted:#64748b;
+  --brand:#3b82f6; --ok:#16a34a; --bad:#ef4444; --chip:#eef2ff; --line:#e5e7eb;
+}
+*{box-sizing:border-box} body{margin:0;font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,"Noto Sans TC",sans-serif;background:var(--bg);color:var(--ink)}
+.wrap{max-width:980px;margin:24px auto;padding:0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 10px 30px rgba(15,23,42,.06);padding:18px}
+h1{margin:0 0 8px;font-size:28px}
+.sub{color:var(--muted);font-size:13px}
 
-.question{font-size:clamp(18px,3vw,21px);line-height:1.6;margin:4px 0 6px;font-weight:600;}
-#optBox{margin-top:2px}
-.opt{display:flex;align-items:flex-start;gap:8px;border:1px solid var(--border);
-background:#0b1328;border-radius:9px;padding:6px 9px;margin:3px 0;
-font-size:clamp(17px,2.6vw,20px);line-height:1.45;transition:border-color .15s,background .15s}
-.opt input{margin-top:3px}
-.opt:hover{border-color:#3b82f6}
-.opt.selected{background:#0d2236;border-color:#3b82f6}
-.opt.correct{border-color:var(--accent)}
-.opt.wrong{border-color:var(--danger)}
+.badges{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 8px}
+.badge{background:#f1f5f9;border:1px solid var(--line);border-radius:12px;padding:6px 10px;font-size:14px}
+.badge b{font-variant-numeric: tabular-nums}
 
-#expBox{font-size:clamp(16px,2.5vw,19px);line-height:1.55;background:#101828;border-radius:9px;
-padding:8px 10px;margin-top:6px;display:none;}
-#expBox.active{display:block;}
-#expBox p{margin:0 0 6px 0;font-weight:600}
-#expBox .note{color:#cbd5e1;font-size:clamp(16px,2.5vw,19px);line-height:1.5}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--line);background:var(--chip);border-radius:999px;font-size:14px;cursor:pointer}
+.chip input{accent-color:var(--brand)}
 
-.controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;justify-content:center}
-.controls button{font-size:clamp(16px,2.5vw,19px);padding:8px 10px;border-radius:8px}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+select,button,input[type="number"]{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff;color:var(--ink);font-size:14px}
+.btn{background:#fff}
+.btn.brand{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.ghost{background:#fff}
+.btn.warn{background:#fde68a;border-color:#f59e0b}
+
+.hr{height:1px;background:var(--line);margin:14px 0}
+
+.q-card{margin-top:14px}
+.section{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.tag{background:#e0e7ff;color:#3730a3;border-radius:999px;padding:4px 8px;font-size:12px}
+.qno{font-size:13px;color:var(--muted)}
+
+.question{font-size:20px;line-height:1.6;margin:6px 0 8px}
+#optBox .opt{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px 10px;margin:4px 0;font-size:17px;line-height:1.45}
+#optBox .opt:hover{border-color:#c7d2fe}
+#optBox input{margin-top:4px}
+.opt.correct{border-color:var(--ok)}
+.opt.wrong{border-color:var(--bad)}
+
+.feedback{margin-top:8px;border-radius:12px;border:1px solid var(--line);background:#f8fafc;padding:10px}
+.feedback .title{font-weight:700;margin:0 0 4px}
+.feedback.ok .title{color:var(--ok)}
+.feedback.bad .title{color:var(--bad)}
+.feedback .note{color:var(--muted);font-size:14px}
+
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.nav .btn{font-size:15px}
+
+@media (max-width:480px){
+  h1{font-size:22px}
+  .question{font-size:18px}
+  #optBox .opt{font-size:16px;padding:7px 9px}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="title"><h1>《大乘起信論》刷題小程式 <span class="note">— v2.1</span></h1></div>
-
-  <!-- 設定區（只有一個上傳） -->
   <div class="card" id="panel-setup">
-    <div class="row" style="margin-bottom:8px">
-      <div>
-        <label>上傳題庫（支援 .xlsx / .json）</label><br>
-        <input id="filePicker" type="file" accept=".json,application/json,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
-        <button class="btn" id="btnLoad">載入題庫</button>
-        <button class="btn reset" id="btnResetApp">重置</button>
-      </div>
+    <h1>大乘起信論 線上刷題</h1>
+    <div class="badges">
+      <div class="badge">共 <b id="stat-total">0</b> 題</div>
+      <div class="badge">目前：<b id="stat-progress">0/0</b></div>
+      <div class="badge">已答對：<b id="stat-correct">0</b></div>
     </div>
+
     <div class="row">
-      <div>
-        <label>出題模式</label><br>
-        <select id="modeSel">
-          <option value="shuffle">隨機</option>
-          <option value="order">依順序</option>
-        </select>
-      </div>
-      <div>
-        <label>本次題數</label><br>
-        <input type="number" id="countInp" min="1" max="200" value="10">
-      </div>
-      <div>
-        <label>&nbsp;</label><br>
-        <button class="btn brand" id="btnStart">開始作答 ▶</button>
-      </div>
+      <div class="sub">章節：</div>
+      <div id="sectionChips" class="chips"></div>
     </div>
-    <div class="note" style="margin-top:6px">
-      JSON 格式：[{"id":1,"section":"總說","question":"……?","options":["A","B","C","D"],"answer":1,"explanation":"可省略"}]；<br>
-      Excel 欄位：id, section, question, optionA, optionB, optionC, optionD, answer(如 A 或 A,C), explanation。
+
+    <div class="row controls">
+      <label><input type="radio" name="mode" value="order" checked> 依順序</label>
+      <label><input type="radio" name="mode" value="shuffle"> 隨機</label>
+
+      <select id="countSel" title="題數">
+        <option value="all">全部</option>
+        <option>5</option>
+        <option selected>10</option>
+        <option>20</option>
+        <option>50</option>
+      </select>
+
+      <button class="btn brand" id="btnStart">開始作答</button>
+      <button class="btn ghost" id="btnReset">重置</button>
     </div>
+
+    <div class="hr"></div>
+
+    <div class="sub">提示：題庫由老師端預先放在 <code>questions.json</code>，學員不需上傳即可作答。</div>
   </div>
 
-  <!-- 作答區 -->
-  <div class="card" id="panel-quiz" style="display:none">
-    <div id="qTags"></div>
-    <div id="qNo"></div>
+  <div class="card q-card" id="panel-quiz" style="display:none">
+    <div class="section">
+      <span class="tag" id="tagSec"></span>
+      <span class="qno" id="qNo"></span>
+    </div>
     <div class="question" id="qText"></div>
     <div id="optBox"></div>
 
-    <details id="expBox">
-      <summary>解析 / 正解</summary>
-      <div id="exp"></div>
-    </details>
+    <div id="feedback" class="feedback" style="display:none">
+      <div class="title" id="fbTitle"></div>
+      <div class="note" id="fbAns"></div>
+      <div class="note" id="fbExp"></div>
+    </div>
 
-    <div class="controls">
+    <div class="nav">
       <button class="btn" id="btnPrev">← 上一題</button>
       <button class="btn" id="btnNext">下一題 →</button>
-      <button class="btn reset" id="btnReset">重置</button>
+      <button class="btn ghost" id="btnBack">回到設定</button>
     </div>
   </div>
-
-  <div class="footer">© 2025 刷題小程式 v2.1 — 單一上傳 / 重置 / 即時回饋</div>
 </div>
 
 <script>
-/* 內建示例，若未上傳仍可測 */
-const BUILTIN=[
-  {id:1,section:"總說",question:"《大乘起信論》依什麼雙門立論以統攝教義？",options:["心真如門與心生滅門","空門與假門","因門與果門","性門與相門"],answer:0,explanation:"本論以『心真如門』『心生滅門』二門統攝一切法。"},
-  {id:2,section:"總說",question:"本論所說『一心二門』中，生滅因依於何者而起？",options:["依於無明自體","依於如來藏真如","依於業力","依於阿賴耶識"],answer:1,explanation:"生滅門不離真如而起，喻如波依水。"},
-  {id:3,section:"五重玄義",question:"作者馬鳴菩薩立論之宗旨，最核心在顯示什麼？",options:["唯識無境","真如不變隨緣","空假中三觀","戒定慧三學"],answer:1,explanation:"宗旨在『不變隨緣』以會通有無，令歸一心。"}
+/* ========== 題庫載入（學生端只讀 questions.json） ========== */
+const FALLBACK = [
+  {"id":1,"section":"總說","question":"《大乘起信論》依什麼雙門立論以統攝教義？","options":["心真如門與心生滅門","空門與假門","因門與果門","性門與相門"],"answer":0,"explanation":"本論以「心真如門」「心生滅門」二門統攝一切法。"},
+  {"id":2,"section":"總說","question":"本論所說「一心二門」中，生滅因依於何者而起？","options":["依於無明自體","依於如來藏真如","依於業力","依於阿賴耶識"],"answer":1,"explanation":"生滅門不離真如而起，喻如波依水。"},
+  {"id":3,"section":"五重玄義","question":"作者馬鳴菩薩立論之宗旨，最核心在顯示什麼？","options":["唯識無境","真如不變隨緣","空假中三觀","戒定慧三學"],"answer":1,"explanation":"宗旨在「不變隨緣」以會通有無，令歸一心。"}
 ];
 
-const $=s=>document.querySelector(s);
-let bank=[],idx=0,paper=[],userSel={},revealed={};
+let BANK = [];
+fetch('questions.json')
+  .then(r => r.ok ? r.json() : Promise.reject())
+  .then(data => { BANK = data; initSetup(); })
+  .catch(() => { BANK = FALLBACK; initSetup(); });
 
-const isArray=Array.isArray;
-function normalizeAnswer(a){ if(a==null) return []; if(isArray(a)) return [...a].sort((x,y)=>x-y); return [a]; }
-function sameArray(a,b){ a=normalizeAnswer(a); b=normalizeAnswer(b); if(a.length!==b.length) return false; return a.every((v,i)=>v===b[i]); }
+/* ========== 狀態 ========== */
+let paper = [];   // 題目索引清單
+let idx = 0;      // 目前題號（在 paper 中）
+let user = {};    // { [id]: number | number[] }
+let revealed = {}; // { [id]: boolean } 是否已顯示解析
+let correctCount = 0;
+
+/* ========== 小工具 ========== */
+const $ = s => document.querySelector(s);
+const isArray = Array.isArray;
+function normalize(a){ if(a==null) return []; return isArray(a)? [...a].sort((x,y)=>x-y) : [a]; }
+function same(a,b){ a=normalize(a); b=normalize(b); return a.length===b.length && a.every((v,i)=>v===b[i]); }
 function shuffle(arr){ return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]); }
+function uniq(arr){return [...new Set(arr)];}
 
-/* 單一上傳：載入題庫 */
-$('#btnLoad').addEventListener('click', async()=>{
-  const input = $('#filePicker');
-  const f = input.files && input.files[0];
-  if(!f){ if(confirm('尚未選擇檔案，是否改用內建示例？')){ bank = JSON.parse(JSON.stringify(BUILTIN)); alert(`載入完成：${bank.length}題`); } return; }
-  const name = f.name.toLowerCase();
-  try{
-    if(name.endsWith('.json')){
-      const txt = await f.text();
-      bank = JSON.parse(txt);
-      alert(`JSON 載入完成：${bank.length}題`);
-    }else if(name.endsWith('.xlsx')){
-      const buf = await f.arrayBuffer();
-      const wb = XLSX.read(new Uint8Array(buf), {type:'array'});
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(ws, {defval:''});
-      const ABC={A:0,B:1,C:2,D:3};
-      bank = rows.map((r,i)=>{
-        const opts=[r.optionA,r.optionB,r.optionC,r.optionD].filter(Boolean);
-        let ans = String(r.answer||'').split(',').map(s=>s.trim().toUpperCase()).map(a=>ABC[a]).filter(v=>v!==undefined);
-        if(ans.length===1) ans=ans[0];
-        return {id:Number(r.id||i+1),section:String(r.section||''),question:String(r.question||''),options:opts,answer:ans,explanation:String(r.explanation||'')};
-      });
-      alert(`Excel 匯入完成：${bank.length}題`);
-    }else{
-      alert('僅支援 .json 或 .xlsx 檔案');
-      return;
-    }
-  }catch(e){
-    alert('載入失敗：'+e.message);
-  }
-});
+/* ========== 初始化設定面板 ========== */
+function initSetup(){
+  // 統計
+  $('#stat-total').textContent = BANK.length;
+  $('#stat-progress').textContent = `0/0`;
+  $('#stat-correct').textContent = `0`;
 
-/* 重置（回到初始面板） */
-function hardReset(){
-  bank=[]; idx=0; paper=[]; userSel={}; revealed={};
-  $('#filePicker').value='';
-  $('#panel-quiz').style.display='none';
-  $('#panel-setup').style.display='block';
+  // 章節 chips
+  const secs = uniq(BANK.map(q=>q.section||'未分類'));
+  const box = $('#sectionChips');
+  box.innerHTML = '';
+  secs.forEach((s,i)=>{
+    const lab = document.createElement('label');
+    lab.className = 'chip';
+    lab.innerHTML = `<input type="checkbox" checked value="${s}">${s}`;
+    box.appendChild(lab);
+  });
+
+  // 題數下拉（依題庫自動縮限）
+  adjustCountOptions(BANK.length);
+
+  // 綁定
+  $('#btnStart').onclick = startExam;
+  $('#btnReset').onclick = hardReset;
+  $('#btnBack').onclick = hardReset;
+  $('#btnPrev').onclick = ()=>{ if(idx>0){ idx--; render(); } };
+  $('#btnNext').onclick = ()=>{ if(idx<paper.length-1){ idx++; render(); } };
 }
-$('#btnReset').addEventListener('click', hardReset);
-$('#btnResetApp').addEventListener('click', hardReset);
 
-/* 開始作答 */
-$('#btnStart').addEventListener('click',()=>{
-  if(!bank.length){
-    if(confirm('尚未載入題庫，是否改用內建示例？')) bank = JSON.parse(JSON.stringify(BUILTIN)); else return;
-  }
-  const mode=$('#modeSel').value;
-  const want=Math.max(1, Math.min(200, parseInt($('#countInp').value||'10',10)));
-  const indices=bank.map((_,i)=>i);
-  const list=(mode==='shuffle')? shuffle(indices) : indices;
+/* 依可用題數調整題數選項 */
+function adjustCountOptions(n){
+  const sel = $('#countSel');
+  [...sel.options].forEach(o=>{
+    if(o.value==='all') return;
+    if(parseInt(o.value,10) > n) o.disabled = true; else o.disabled = false;
+  });
+}
+
+/* ========== 開始作答 ========== */
+function startExam(){
+  // 章節過濾
+  const chosen = [...document.querySelectorAll('#sectionChips input:checked')].map(i=>i.value);
+  const poolIdx = BANK.map((q,i)=>({q,i})).filter(x=>chosen.includes(x.q.section||'未分類')).map(x=>x.i);
+  if(poolIdx.length===0){ alert('請至少勾選一個章節'); return; }
+
+  // 題數與模式
+  const mode = document.querySelector('input[name="mode"]:checked').value; // order/shuffle
+  const wantStr = $('#countSel').value;
+  const want = (wantStr==='all') ? poolIdx.length : Math.min(parseInt(wantStr,10), poolIdx.length);
+  const list = (mode==='shuffle') ? shuffle(poolIdx) : poolIdx;
   paper = list.slice(0, want);
-  idx=0; userSel={}; revealed={};
-  $('#panel-setup').style.display='none';
-  $('#panel-quiz').style.display='block';
+
+  // 狀態歸零
+  idx = 0; user = {}; revealed = {}; correctCount = 0;
+
+  // 顯示題目卡
+  $('#panel-setup').style.display = 'none';
+  $('#panel-quiz').style.display = 'block';
   render();
-});
+}
 
-/* 上/下一題 */
-$('#btnPrev').addEventListener('click',()=>{ if(idx>0){ idx--; render(); }});
-$('#btnNext').addEventListener('click',()=>{ if(idx<paper.length-1){ idx++; render(); }});
-
-/* 核心：渲染一題與作答判斷 */
+/* ========== 渲染一題 ========== */
 function render(){
-  const q=bank[paper[idx]]; if(!q) return;
-  $('#qNo').textContent=`第 ${idx+1} / ${paper.length} 題`;
-  $('#qText').textContent=q.question;
-  $('#qTags').innerHTML = q.section ? `<span class="tag">${q.section}</span>` : '';
+  const q = BANK[paper[idx]]; if(!q) return;
 
-  const correct = normalizeAnswer(q.answer);
-  const isMulti = correct.length>1;
+  // 頁眉/統計
+  $('#tagSec').textContent = q.section || '未分類';
+  $('#qNo').textContent = `第 ${idx+1} / ${paper.length} 題`;
+  $('#stat-progress').textContent = `${idx+1}/${paper.length}`;
+  $('#stat-correct').textContent = correctCount;
+
+  // 題幹
+  $('#qText').textContent = q.question || '';
+
+  // 選項
   const box = $('#optBox'); box.innerHTML='';
-  const cur = normalizeAnswer(userSel[q.id]);
+  const correct = normalize(q.answer);
+  const isMulti = correct.length > 1;
+  const cur = normalize(user[q.id]);
 
-  (q.options||[]).forEach((opt,i)=>{
-    const row=document.createElement('label'); row.className='opt';
-    const ip=document.createElement('input'); ip.type=isMulti?'checkbox':'radio'; ip.name='opt'; ip.value=i;
+  (q.options || []).forEach((opt,i)=>{
+    const row = document.createElement('label'); row.className='opt';
+    const ip = document.createElement('input'); ip.type = isMulti ? 'checkbox' : 'radio'; ip.name='opt'; ip.value=i;
+    if(isMulti && cur.includes(i)) ip.checked = true;
+    if(!isMulti && cur[0]===i) ip.checked = true;
 
-    // 恢復已選狀態
-    if(isMulti && cur.includes(i)) ip.checked=true;
-    if(!isMulti && cur[0]===i) ip.checked=true;
-
-    // 點整塊即可選
-    row.addEventListener('click',(e)=>{
-      if(e.target.tagName.toLowerCase()!=='input'){ ip.checked=!ip.checked; }
+    row.addEventListener('click', (e)=>{
+      if(e.target.tagName.toLowerCase()!=='input'){ ip.checked = !ip.checked; }
 
       if(isMulti){
-        const now = new Set(normalizeAnswer(userSel[q.id]));
+        const now = new Set(normalize(user[q.id]));
         if(ip.checked) now.add(i); else now.delete(i);
-        userSel[q.id] = [...now].sort((a,b)=>a-b);
+        user[q.id] = [...now].sort((a,b)=>a-b);
 
-        // 多選：只有當「選擇數量＝正解數量」才評分
-        if(userSel[q.id].length === correct.length){
+        if(user[q.id].length === correct.length){
+          const right = same(user[q.id], q.answer);
+          if(revealed[q.id] !== true){ // 首次評分才計數
+            if(right) correctCount++;
+          }
           revealed[q.id] = true;
-          renderExplain(q, evaluate(q));
-          markOptions();
+          showFeedback(q, right);
+          colorize(box, q);
         }else{
           revealed[q.id] = false;
-          renderExplain(q, null); // 尚未評分
-          markOptions(false);
+          hideFeedback();
+          colorize(box, q, false);
         }
       }else{
-        // 單選：點了就評分
-        userSel[q.id] = i;
+        user[q.id] = i;
+        const right = (i === correct[0]);
+        if(revealed[q.id] !== true){ // 首次評分才計數
+          if(right) correctCount++;
+        }
         revealed[q.id] = true;
-        renderExplain(q, evaluate(q));
-        // 清除其他選項的選取樣式
-        box.querySelectorAll('.opt').forEach(el=>el.classList.remove('selected'));
-        markOptions();
+        showFeedback(q, right);
+        colorize(box, q);
       }
-
-      row.classList.toggle('selected', ip.checked);
     });
 
-    const text=document.createElement('div');
-    text.innerHTML=`<b>${String.fromCharCode(65+i)}.</b> ${opt}`;
+    const text = document.createElement('div'); text.innerHTML = `<b>${String.fromCharCode(65+i)}.</b> ${opt}`;
     row.appendChild(ip); row.appendChild(text); box.appendChild(row);
   });
 
-  // 初始渲染
-  renderExplain(q, revealed[q.id] ? evaluate(q) : null);
-  markOptions(revealed[q.id]);
+  // 初始回饋/著色
+  if(revealed[q.id]){ showFeedback(q, same(user[q.id], q.answer)); colorize(box, q); }
+  else { hideFeedback(); colorize(box, q, false); }
+}
 
-  function markOptions(show= true){
-    const rows=box.querySelectorAll('.opt');
-    rows.forEach((row,i)=>{
-      row.classList.remove('correct','wrong');
-      row.style.borderColor='var(--border)';
-      if(show){
-        if(correct.includes(i)) row.classList.add('correct');
-        else {
-          const cur = normalizeAnswer(userSel[q.id]);
-          if(cur.includes(i)) row.classList.add('wrong');
-        }
+/* 著色：顯示正解與錯選 */
+function colorize(box, q, show=true){
+  const correct = normalize(q.answer);
+  box.querySelectorAll('.opt').forEach((row,i)=>{
+    row.classList.remove('correct','wrong');
+    if(show){
+      if(correct.includes(i)) row.classList.add('correct');
+      else {
+        const cur = normalize(user[q.id]);
+        if(cur.includes(i)) row.classList.add('wrong');
       }
-    });
-  }
+    }
+  });
 }
 
-/* 評分與解析顯示：先顯示「答對了/答錯了」，再顯示「正確答案：」 */
-function evaluate(q){
-  const correct = normalizeAnswer(q.answer);
-  const cur = normalizeAnswer(userSel[q.id]);
-  if(cur.length===0) return null;
-  return sameArray(cur, correct);
+/* 顯示 / 隱藏 回饋 */
+function showFeedback(q, isRight){
+  const fb = $('#feedback'); fb.style.display='block';
+  fb.classList.toggle('ok', isRight); fb.classList.toggle('bad', !isRight);
+  $('#fbTitle').textContent = isRight ? '答對了 ✅' : '答錯了 ❌';
+  const label = normalize(q.answer).map(i=>String.fromCharCode(65+i)).join(', ');
+  $('#fbAns').textContent = `正確答案：${label}`;
+  $('#fbExp').textContent = q.explanation ? `解析：${q.explanation}` : '（此題暫無解析）';
 }
+function hideFeedback(){ $('#feedback').style.display='none'; }
 
-function renderExplain(q, isRight){
-  const dst=$('#exp'), box=$('#expBox');
-  if(isRight===null){ // 尚未評分（多選未選滿）
-    box.classList.remove('active');
-    dst.innerHTML='';
-    return;
-  }
-  const correct = normalizeAnswer(q.answer);
-  const label = correct.map(i=>String.fromCharCode(65+i)).join(', ');
-  const head = isRight ? '答對了 ✅' : '答錯了 ❌';
-  box.classList.add('active');
-  dst.innerHTML =
-    `<p>${head}</p>` +
-    `<p>正確答案：<b>${label || '（未設定）'}</b></p>` +
-    (q.explanation ? `<div class="note">${q.explanation}</div>` : '<div class="note">（此題暫無解析）</div>');
+/* ========== 重置回設定面板 ========== */
+function hardReset(){
+  paper=[]; idx=0; user={}; revealed={}; correctCount=0;
+  $('#panel-quiz').style.display='none';
+  $('#panel-setup').style.display='block';
+  // 重新計數（避免前次狀態殘留）
+  $('#stat-progress').textContent='0/0';
+  $('#stat-correct').textContent='0';
 }
 </script>
 </body>
