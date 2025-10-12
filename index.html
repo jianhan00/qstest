@@ -2,8 +2,8 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.1, maximum-scale=1.1" />
-  <title>大乘起信論｜刷題小程式 v1.3（解析加大版）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>大乘起信論｜刷題小程式 v1.4（緊湊舒適版）</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     :root{
@@ -16,67 +16,55 @@
       background:linear-gradient(180deg,#0b1220,#0a1020);
       color:var(--ink);
     }
-    .wrap{max-width:960px;margin:24px auto;padding:20px}
-    .title{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-    .title h1{font-size:24px;margin:0}
-    .card{background:var(--card);border:1px solid #1f2937;border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
-    label{font-size:13px;color:var(--muted)}
+    .wrap{max-width:960px;margin:12px auto;padding:12px}
+    .title h1{font-size:22px;margin:0}
+    .card{background:var(--card);border:1px solid #1f2937;border-radius:14px;padding:14px;box-shadow:0 8px 20px rgba(0,0,0,.25)}
     select,button,input[type="number"],input[type="url"]{
-      padding:8px 10px;border-radius:10px;border:1px solid #334155;background:#0b1220;color:var(--ink)
+      padding:6px 8px;border-radius:8px;border:1px solid #334155;background:#0b1220;color:var(--ink)
     }
     button{cursor:pointer}
     .btn{background:#0b1328;border:1px solid #2c3e50}
     .btn:hover{border-color:#64748b}
     .btn.brand{border-color:#0ea5e9;background:#0b1b2e}
-    .btn.good{border-color:#22c55e}
-    .btn.bad{border-color:#f43f5e}
     .note{color:var(--muted);font-size:12px}
-    .hidden{display:none}
-    .tag{font-size:12px;color:#0b1220;background:#a5f3fc;border-radius:999px;padding:4px 8px}
-    .footer{opacity:.8;font-size:12px;margin-top:20px;text-align:center;}
+    .tag{font-size:12px;color:#0b1220;background:#a5f3fc;border-radius:999px;padding:3px 6px}
+    .footer{opacity:.7;font-size:11px;margin-top:10px;text-align:center;}
 
-    /* 📱 手機舒適閱讀加強 */
+    /* 📱 緊湊閱讀模式 */
     .question {
-      font-size: clamp(22px, 3.5vw, 28px);
-      line-height: 1.9;
-      margin: 12px 0 16px;
+      font-size: clamp(18px, 3vw, 22px);
+      line-height: 1.6;
+      margin: 6px 0 8px;
       font-weight: 600;
     }
     .opt {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      border: 1px solid #1f2937;
-      background: #0b1328;
-      border-radius: 14px;
-      padding: 16px 14px;
-      margin: 12px 0;
-      font-size: clamp(19px, 3vw, 23px);
-      line-height: 1.7;
+      display:flex;
+      align-items:flex-start;
+      gap:8px;
+      border:1px solid #1f2937;
+      background:#0b1328;
+      border-radius:10px;
+      padding:8px 10px;
+      margin:6px 0;
+      font-size: clamp(16px, 2.6vw, 20px);
+      line-height:1.5;
     }
     #expBox {
-      font-size: clamp(18px, 2.8vw, 22px);
-      line-height: 1.9;
-      background: #101828;
-      border-radius: 12px;
-      padding: 16px 18px;
-      margin-top: 12px;
+      font-size: clamp(15px, 2.5vw, 19px);
+      line-height:1.6;
+      background:#101828;
+      border-radius:10px;
+      padding:10px 12px;
+      margin-top:6px;
     }
-    #expBox p {
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-    #expBox .note {
-      color:#cbd5e1;
-      font-size: clamp(17px, 2.6vw, 21px);
-      line-height: 1.8;
-    }
+    #expBox p { margin-bottom:4px; font-weight:600; }
+    #expBox .note { color:#cbd5e1; font-size: clamp(14px, 2.4vw, 18px); line-height:1.5; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="title">
-      <h1>《大乘起信論》刷題小程式 <span class="note">— v1.3 解析加大版</span></h1>
+      <h1>《大乘起信論》刷題小程式 <span class="note">— v1.4 緊湊舒適版</span></h1>
     </div>
 
     <div class="card" id="panel-setup">
@@ -89,7 +77,7 @@
       </select>
       <input type="file" id="filePickerJson" accept="application/json" class="hidden"/>
       <input type="file" id="filePickerXlsx" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xlsx" class="hidden"/>
-      <input type="url" id="urlInput" class="hidden" placeholder="https://…/questions.json" style="width:260px"/>
+      <input type="url" id="urlInput" class="hidden" placeholder="https://…/questions.json" style="width:240px"/>
       <button class="btn" id="btnLoad">載入題庫</button>
       <div class="note">
         JSON 格式：[{"id":1,"section":"總說","question":"……?","options":["A","B","C","D"],"answer":1,"explanation":"可省略"}]
@@ -109,13 +97,14 @@
         <summary>解析 / 正解</summary>
         <div id="exp"></div>
       </details>
-      <div style="margin-top:10px;">
+      <div style="margin-top:8px;">
         <button class="btn" id="btnPrev">← 上一題</button>
         <button class="btn" id="btnShow">顯示/隱藏 答案</button>
         <button class="btn" id="btnNext">下一題 →</button>
       </div>
     </div>
-    <div class="footer">© 2025 刷題小程式 v1.3 — 支援 JSON 與 Excel 題庫</div>
+
+    <div class="footer">© 2025 刷題小程式 v1.4 — JSON/Excel 題庫支援</div>
   </div>
 
   <script>
@@ -124,12 +113,10 @@
       {id:2,section:"總說",question:"本論所說『一心二門』中，生滅因依於何者而起？",options:["依於無明自體","依於如來藏真如","依於業力","依於阿賴耶識"],answer:1,explanation:"生滅門不離真如而起，喻如波依水。"},
       {id:3,section:"五重玄義",question:"作者馬鳴菩薩立論之宗旨，最核心在顯示什麼？",options:["唯識無境","真如不變隨緣","空假中三觀","戒定慧三學"],answer:1,explanation:"宗旨在『不變隨緣』以會通有無，令歸一心。"}
     ];
-
     const $=s=>document.querySelector(s);
     let bank=[],idx=0,paper=[],userAns={},showAnswer=false;
     const ABC={A:0,B:1,C:2,D:3};
     const isArray=Array.isArray;
-
     function normalizeAnswer(a){if(a==null)return[];if(isArray(a))return[...a].sort((x,y)=>x-y);return[a];}
     function sameArray(a,b){a=normalizeAnswer(a);b=normalizeAnswer(b);if(a.length!==b.length)return false;return a.every((v,i)=>v===b[i]);}
     function shuffle(arr){return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);}
@@ -208,7 +195,6 @@
       function markOptions(){
         const rows=box.querySelectorAll('.opt');
         rows.forEach((row,i)=>{
-          row.classList.remove('correct','wrong');
           if(showAnswer){
             if(correct.includes(i))row.style.borderColor='#22c55e';
             else if((isArray(userAns[q.id])&&userAns[q.id].includes(i))||userAns[q.id]===i)
