@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>大乘起信論｜刷題小程式 v1.5（緊湊進階版）</title>
+  <title>大乘起信論｜刷題小程式 v1.6（強化互動版）</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     :root{
@@ -16,7 +16,7 @@
       background:linear-gradient(180deg,#0b1220,#0a1020);
       color:var(--ink);
     }
-    .wrap{max-width:960px;margin:10px auto;padding:10px}
+    .wrap{max-width:960px;margin:8px auto;padding:10px}
     .title h1{font-size:22px;margin:0}
     .card{background:var(--card);border:1px solid #1f2937;border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
     select,button,input[type="number"],input[type="url"]{
@@ -30,7 +30,7 @@
     .tag{font-size:12px;color:#0b1220;background:#a5f3fc;border-radius:999px;padding:3px 6px}
     .footer{opacity:.7;font-size:11px;margin-top:10px;text-align:center;}
 
-    /* 📱 緊湊進階模式 */
+    /* 📱 手機緊湊互動版樣式 */
     .question {
       font-size: clamp(18px, 3vw, 21px);
       line-height: 1.6;
@@ -43,30 +43,55 @@
       gap:6px;
       border:1px solid #1f2937;
       background:#0b1328;
-      border-radius:9px;
-      padding:6px 8px;
-      margin:3px 0;           /* ← 比前版再縮 0.3 公分（約 3px） */
-      font-size: clamp(16px, 2.5vw, 19px);
+      border-radius:8px;
+      padding:5px 8px;
+      margin:2px 0; /* 更緊湊 */
+      font-size: clamp(17px, 2.6vw, 20px);
       line-height:1.45;
     }
+    /* 作答區 */
+    #answerBox {
+      margin-top:4px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size: clamp(17px, 2.6vw, 20px);
+    }
+    #answerInput {
+      flex:1;
+      padding:6px 8px;
+      border-radius:8px;
+      border:1px solid #334155;
+      background:#0b1220;
+      color:var(--ink);
+      font-size:inherit;
+    }
     #expBox {
-      font-size: clamp(15px, 2.4vw, 18px);
-      line-height:1.5;
+      font-size: clamp(16px, 2.5vw, 19px);
+      line-height:1.55;
       background:#101828;
       border-radius:9px;
       padding:8px 10px;
       margin-top:5px;
     }
     #expBox p { margin-bottom:4px; font-weight:600; }
-    #expBox .note { color:#cbd5e1; font-size: clamp(14px, 2.3vw, 17px); line-height:1.45; }
+    #expBox .note { color:#cbd5e1; font-size: clamp(16px, 2.5vw, 19px); line-height:1.5; }
+    /* 按鈕區：字體放大 */
+    .controls button {
+      font-size: clamp(16px, 2.5vw, 19px);
+      padding:8px 10px;
+      border-radius:8px;
+    }
+    .controls { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; justify-content:center; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="title">
-      <h1>《大乘起信論》刷題小程式 <span class="note">— v1.5 緊湊進階版</span></h1>
+      <h1>《大乘起信論》刷題小程式 <span class="note">— v1.6 強化互動版</span></h1>
     </div>
 
+    <!-- 題庫設定區 -->
     <div class="card" id="panel-setup">
       <label>題庫來源</label><br>
       <select id="sourceSel">
@@ -79,32 +104,39 @@
       <input type="file" id="filePickerXlsx" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xlsx" class="hidden"/>
       <input type="url" id="urlInput" class="hidden" placeholder="https://…/questions.json" style="width:240px"/>
       <button class="btn" id="btnLoad">載入題庫</button>
-      <div class="note">
-        JSON 格式：[{"id":1,"section":"總說","question":"……?","options":["A","B","C","D"],"answer":1,"explanation":"可省略"}]
-      </div>
       <hr>
       <label>出題數量</label><br>
       <input type="number" id="countInp" min="1" max="200" value="10"><br><br>
       <button class="btn brand" id="btnStart">開始作答 ▶</button>
     </div>
 
+    <!-- 題目區 -->
     <div class="card" id="panel-quiz" style="display:none">
       <div id="qTags"></div>
       <div id="qNo"></div>
       <div class="question" id="qText"></div>
       <div id="optBox"></div>
+
+      <!-- 新增：作答輸入區 -->
+      <div id="answerBox">
+        <label for="answerInput">您的答案：</label>
+        <input id="answerInput" type="text" placeholder="輸入 A 或 A,B">
+        <button class="btn brand" id="btnSubmit">送出</button>
+      </div>
+
       <details id="expBox" open>
         <summary>解析 / 正解</summary>
         <div id="exp"></div>
       </details>
-      <div style="margin-top:8px;">
+
+      <div class="controls">
         <button class="btn" id="btnPrev">← 上一題</button>
         <button class="btn" id="btnShow">顯示/隱藏 答案</button>
         <button class="btn" id="btnNext">下一題 →</button>
       </div>
     </div>
 
-    <div class="footer">© 2025 刷題小程式 v1.5 — JSON/Excel 題庫支援</div>
+    <div class="footer">© 2025 刷題小程式 v1.6 — 強化互動與手機適配</div>
   </div>
 
   <script>
@@ -113,6 +145,7 @@
       {id:2,section:"總說",question:"本論所說『一心二門』中，生滅因依於何者而起？",options:["依於無明自體","依於如來藏真如","依於業力","依於阿賴耶識"],answer:1,explanation:"生滅門不離真如而起，喻如波依水。"},
       {id:3,section:"五重玄義",question:"作者馬鳴菩薩立論之宗旨，最核心在顯示什麼？",options:["唯識無境","真如不變隨緣","空假中三觀","戒定慧三學"],answer:1,explanation:"宗旨在『不變隨緣』以會通有無，令歸一心。"}
     ];
+
     const $=s=>document.querySelector(s);
     let bank=[],idx=0,paper=[],userAns={},showAnswer=false;
     const ABC={A:0,B:1,C:2,D:3};
@@ -171,6 +204,17 @@
     $('#btnNext').addEventListener('click',()=>{if(idx<paper.length-1){idx++;render();}});
     $('#btnShow').addEventListener('click',()=>{showAnswer=!showAnswer;render();});
 
+    $('#btnSubmit').addEventListener('click',()=>{
+      const input=$('#answerInput').value.trim().toUpperCase();
+      if(!input)return alert('請輸入答案');
+      const letters=input.split(',').map(s=>s.trim()).filter(Boolean);
+      const ans=letters.map(l=>ABC[l]).filter(x=>x!==undefined);
+      userAns[bank[paper[idx]].id]=ans.length===1?ans[0]:ans;
+      renderExplain(bank[paper[idx]]);
+      showAnswer=true;
+      render();
+    });
+
     function render(){
       const q=bank[paper[idx]];if(!q)return;
       $('#qNo').textContent=`第 ${idx+1} / ${paper.length} 題`;
@@ -191,6 +235,7 @@
         const text=document.createElement('div');text.innerHTML=`<b>${String.fromCharCode(65+i)}.</b> ${opt}`;
         row.appendChild(ip);row.appendChild(text);box.appendChild(row);
       });
+      $('#answerInput').value='';
       renderExplain(q);markOptions();
       function markOptions(){
         const rows=box.querySelectorAll('.opt');
