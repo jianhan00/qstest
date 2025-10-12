@@ -3,25 +3,20 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>大乘起信論｜刷題小程式 v1.6（強化互動版）</title>
+  <title>大乘起信論｜刷題小程式 v1.8（精簡互動版）</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     :root{
       --bg:#0b1220;--card:#0f172a;--ink:#e2e8f0;
       --muted:#94a3b8;--brand:#38bdf8;--accent:#22c55e;--danger:#f43f5e;
+      --border:#1f2937;
     }
     *{box-sizing:border-box;}
-    body{
-      margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,"Noto Sans TC",sans-serif;
-      background:linear-gradient(180deg,#0b1220,#0a1020);
-      color:var(--ink);
-    }
-    .wrap{max-width:960px;margin:8px auto;padding:10px}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,"Noto Sans TC",sans-serif;background:linear-gradient(180deg,#0b1220,#0a1020);color:var(--ink);}
+    .wrap{max-width:960px;margin:10px auto;padding:10px}
     .title h1{font-size:22px;margin:0}
-    .card{background:var(--card);border:1px solid #1f2937;border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
-    select,button,input[type="number"],input[type="url"]{
-      padding:6px 8px;border-radius:8px;border:1px solid #334155;background:#0b1220;color:var(--ink)
-    }
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+    select,button,input[type="number"],input[type="url"]{padding:6px 8px;border-radius:8px;border:1px solid #334155;background:#0b1220;color:var(--ink)}
     button{cursor:pointer}
     .btn{background:#0b1328;border:1px solid #2c3e50}
     .btn:hover{border-color:#64748b}
@@ -30,68 +25,35 @@
     .tag{font-size:12px;color:#0b1220;background:#a5f3fc;border-radius:999px;padding:3px 6px}
     .footer{opacity:.7;font-size:11px;margin-top:10px;text-align:center;}
 
-    /* 📱 手機緊湊互動版樣式 */
-    .question {
-      font-size: clamp(18px, 3vw, 21px);
-      line-height: 1.6;
-      margin: 4px 0 6px;
-      font-weight: 600;
-    }
-    .opt {
-      display:flex;
-      align-items:flex-start;
-      gap:6px;
-      border:1px solid #1f2937;
-      background:#0b1328;
-      border-radius:8px;
-      padding:5px 8px;
-      margin:2px 0; /* 更緊湊 */
-      font-size: clamp(17px, 2.6vw, 20px);
-      line-height:1.45;
-    }
-    /* 作答區 */
-    #answerBox {
-      margin-top:4px;
-      display:flex;
-      align-items:center;
-      gap:8px;
-      font-size: clamp(17px, 2.6vw, 20px);
-    }
-    #answerInput {
-      flex:1;
-      padding:6px 8px;
-      border-radius:8px;
-      border:1px solid #334155;
-      background:#0b1220;
-      color:var(--ink);
-      font-size:inherit;
-    }
-    #expBox {
-      font-size: clamp(16px, 2.5vw, 19px);
-      line-height:1.55;
-      background:#101828;
-      border-radius:9px;
-      padding:8px 10px;
-      margin-top:5px;
-    }
-    #expBox p { margin-bottom:4px; font-weight:600; }
-    #expBox .note { color:#cbd5e1; font-size: clamp(16px, 2.5vw, 19px); line-height:1.5; }
-    /* 按鈕區：字體放大 */
-    .controls button {
-      font-size: clamp(16px, 2.5vw, 19px);
-      padding:8px 10px;
-      border-radius:8px;
-    }
-    .controls { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; justify-content:center; }
+    /* 文字比例（清楚 + 緊湊） */
+    .question{font-size:clamp(18px,3vw,21px);line-height:1.6;margin:4px 0 6px;font-weight:600;}
+
+    /* 選項（整塊可點） */
+    #optBox{margin-top:2px}
+    .opt{display:flex;align-items:flex-start;gap:8px;border:1px solid var(--border);background:#0b1328;border-radius:9px;padding:6px 9px;margin:3px 0;font-size:clamp(17px,2.6vw,20px);line-height:1.45;transition:border-color .15s,background .15s}
+    .opt input{margin-top:3px}
+    .opt:hover{border-color:#3b82f6}
+    .opt.selected{background:#0d2236;border-color:#3b82f6}
+    .opt.correct{border-color:var(--accent)}
+    .opt.wrong{border-color:var(--danger)}
+
+    /* 解析區（與控制鍵同級字體） */
+    #expBox{font-size:clamp(16px,2.5vw,19px);line-height:1.55;background:#101828;border-radius:9px;padding:8px 10px;margin-top:6px}
+    #expBox p{margin:0 0 6px 0;font-weight:600}
+    #expBox .note{color:#cbd5e1;font-size:clamp(16px,2.5vw,19px);line-height:1.5}
+
+    /* 控制鍵字體放大到與解析一致 */
+    .controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;justify-content:center}
+    .controls button{font-size:clamp(16px,2.5vw,19px);padding:8px 10px;border-radius:8px}
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="title">
-      <h1>《大乘起信論》刷題小程式 <span class="note">— v1.6 強化互動版</span></h1>
+      <h1>《大乘起信論》刷題小程式 <span class="note">— v1.8 精簡互動版</span></h1>
     </div>
 
-    <!-- 題庫設定區 -->
+    <!-- 題庫設定 -->
     <div class="card" id="panel-setup">
       <label>題庫來源</label><br>
       <select id="sourceSel">
@@ -110,19 +72,12 @@
       <button class="btn brand" id="btnStart">開始作答 ▶</button>
     </div>
 
-    <!-- 題目區 -->
+    <!-- 題目作答（點選即作答） -->
     <div class="card" id="panel-quiz" style="display:none">
       <div id="qTags"></div>
       <div id="qNo"></div>
       <div class="question" id="qText"></div>
       <div id="optBox"></div>
-
-      <!-- 新增：作答輸入區 -->
-      <div id="answerBox">
-        <label for="answerInput">您的答案：</label>
-        <input id="answerInput" type="text" placeholder="輸入 A 或 A,B">
-        <button class="btn brand" id="btnSubmit">送出</button>
-      </div>
 
       <details id="expBox" open>
         <summary>解析 / 正解</summary>
@@ -136,7 +91,7 @@
       </div>
     </div>
 
-    <div class="footer">© 2025 刷題小程式 v1.6 — 強化互動與手機適配</div>
+    <div class="footer">© 2025 刷題小程式 v1.8 — 可點選作答 / JSON・Excel 題庫</div>
   </div>
 
   <script>
@@ -147,116 +102,156 @@
     ];
 
     const $=s=>document.querySelector(s);
-    let bank=[],idx=0,paper=[],userAns={},showAnswer=false;
-    const ABC={A:0,B:1,C:2,D:3};
+    let bank=[],idx=0,paper=[],userSel={},showAnswer=false,submitted={};
     const isArray=Array.isArray;
-    function normalizeAnswer(a){if(a==null)return[];if(isArray(a))return[...a].sort((x,y)=>x-y);return[a];}
-    function sameArray(a,b){a=normalizeAnswer(a);b=normalizeAnswer(b);if(a.length!==b.length)return false;return a.every((v,i)=>v===b[i]);}
-    function shuffle(arr){return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);}
 
+    function normalizeAnswer(a){ if(a==null) return []; if(isArray(a)) return [...a].sort((x,y)=>x-y); return [a]; }
+    function sameArray(a,b){ a=normalizeAnswer(a); b=normalizeAnswer(b); if(a.length!==b.length) return false; return a.every((v,i)=>v===b[i]); }
+    function shuffle(arr){ return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]); }
+
+    // 題庫載入
+    const sourceSel=$('#sourceSel'), filePickerJson=$('#filePickerJson'), filePickerXlsx=$('#filePickerXlsx'), urlInput=$('#urlInput');
+    sourceSel.addEventListener('change',()=>{
+      const v=sourceSel.value;
+      filePickerJson.classList.toggle('hidden', v!=='upload');
+      filePickerXlsx.classList.toggle('hidden', v!=='excel');
+      urlInput.classList.toggle('hidden', v!=='url');
+    });
     $('#btnLoad').addEventListener('click',async()=>{
       try{
-        const mode=$('#sourceSel').value;
-        if(mode==='builtin'){bank=JSON.parse(JSON.stringify(BUILTIN));alert(`載入完成：${bank.length}題`);}
-        else if(mode==='upload'){$('#filePickerJson').click();return;}
-        else if(mode==='excel'){$('#filePickerXlsx').click();return;}
-        else if(mode==='url'){const url=$('#urlInput').value.trim();if(!url)return alert('請輸入連結');const res=await fetch(url);bank=await res.json();alert(`載入完成：${bank.length}題`);}
-      }catch(e){alert('載入失敗:'+e.message);}
+        const v=sourceSel.value;
+        if(v==='builtin'){ bank=JSON.parse(JSON.stringify(BUILTIN)); alert(`載入完成：${bank.length}題`); }
+        else if(v==='upload'){ filePickerJson.click(); return; }
+        else if(v==='excel'){ filePickerXlsx.click(); return; }
+        else if(v==='url'){ const url=urlInput.value.trim(); if(!url) return alert('請輸入連結'); const res=await fetch(url); bank=await res.json(); alert(`載入完成：${bank.length}題`); }
+      }catch(e){ alert('載入失敗：'+e.message); }
     });
-
-    $('#filePickerJson').addEventListener('change',async(e)=>{
-      const f=e.target.files?.[0];if(!f)return;
-      try{const txt=await f.text();bank=JSON.parse(txt);alert(`載入完成：${bank.length}題`);}catch(err){alert('JSON 解析失敗');}
+    filePickerJson.addEventListener('change',async(e)=>{
+      const f=e.target.files?.[0]; if(!f) return;
+      try{ bank=JSON.parse(await f.text()); alert(`載入完成：${bank.length}題`); }catch{ alert('JSON 解析失敗'); }
     });
-
-    $('#filePickerXlsx').addEventListener('change',async(e)=>{
-      const f=e.target.files?.[0];if(!f)return;
+    filePickerXlsx.addEventListener('change',async(e)=>{
+      const f=e.target.files?.[0]; if(!f) return;
       const reader=new FileReader();
       reader.onload=(evt)=>{
         try{
           const data=new Uint8Array(evt.target.result);
-          const wb=XLSX.read(data,{type:'array'});
-          const ws=wb.Sheets[wb.SheetNames[0]];
+          const wb=XLSX.read(data,{type:'array'}), ws=wb.Sheets[wb.SheetNames[0]];
           const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
           bank=rows.map((r,i)=>{
-            const opts=[r.optionA,r.optionB,r.optionC,r.optionD].filter(x=>x);
-            let ans=String(r.answer||'').split(',').map(s=>s.trim().toUpperCase()).map(a=>ABC[a]).filter(x=>x!==undefined);
-            if(ans.length===1)ans=ans[0];
-            return{id:Number(r.id||i+1),section:String(r.section||''),question:String(r.question||''),options:opts,answer:ans,explanation:String(r.explanation||'')};
+            const ABC={A:0,B:1,C:2,D:3};
+            const opts=[r.optionA,r.optionB,r.optionC,r.optionD].filter(Boolean);
+            let ans=String(r.answer||'').split(',').map(s=>s.trim().toUpperCase()).map(a=>ABC[a]).filter(v=>v!==undefined);
+            if(ans.length===1) ans=ans[0];
+            return {id:Number(r.id||i+1),section:String(r.section||''),question:String(r.question||''),options:opts,answer:ans,explanation:String(r.explanation||'')};
           });
           alert(`Excel 匯入完成：${bank.length}題`);
-        }catch(err){alert('Excel 解析失敗:'+err.message);}
+        }catch(err){ alert('Excel 解析失敗：'+err.message); }
       };
       reader.readAsArrayBuffer(f);
     });
 
+    // 開始作答
     $('#btnStart').addEventListener('click',()=>{
-      if(!bank.length){if(confirm('尚未載入題庫，是否改用內建示例？'))bank=JSON.parse(JSON.stringify(BUILTIN));else return;}
+      if(!bank.length){
+        if(confirm('尚未載入題庫，是否改用內建示例？')) bank=JSON.parse(JSON.stringify(BUILTIN)); else return;
+      }
       const want=parseInt($('#countInp').value||'10',10);
       paper=shuffle(bank.map((_,i)=>i)).slice(0,want);
-      idx=0;userAns={};showAnswer=false;
+      idx=0; userSel={}; submitted={}; showAnswer=false;
       $('#panel-setup').style.display='none';
       $('#panel-quiz').style.display='block';
       render();
     });
 
-    $('#btnPrev').addEventListener('click',()=>{if(idx>0){idx--;render();}});
-    $('#btnNext').addEventListener('click',()=>{if(idx<paper.length-1){idx++;render();}});
-    $('#btnShow').addEventListener('click',()=>{showAnswer=!showAnswer;render();});
+    // 控制鈕
+    $('#btnPrev').addEventListener('click',()=>{ if(idx>0){ idx--; showAnswer=!!submitted[bank[paper[idx]].id]; render(); }});
+    $('#btnNext').addEventListener('click',()=>{ if(idx<paper.length-1){ idx++; showAnswer=!!submitted[bank[paper[idx]].id]; render(); }});
+    $('#btnShow').addEventListener('click',()=>{ showAnswer=!showAnswer; render(); });
 
-    $('#btnSubmit').addEventListener('click',()=>{
-      const input=$('#answerInput').value.trim().toUpperCase();
-      if(!input)return alert('請輸入答案');
-      const letters=input.split(',').map(s=>s.trim()).filter(Boolean);
-      const ans=letters.map(l=>ABC[l]).filter(x=>x!==undefined);
-      userAns[bank[paper[idx]].id]=ans.length===1?ans[0]:ans;
-      renderExplain(bank[paper[idx]]);
-      showAnswer=true;
-      render();
-    });
-
+    // 渲染
     function render(){
-      const q=bank[paper[idx]];if(!q)return;
+      const q=bank[paper[idx]]; if(!q) return;
       $('#qNo').textContent=`第 ${idx+1} / ${paper.length} 題`;
       $('#qText').textContent=q.question;
-      const tagBox=$('#qTags');tagBox.innerHTML=q.section?`<span class="tag">${q.section}</span>`:'';
-      const box=$('#optBox');box.innerHTML='';
-      const correct=normalizeAnswer(q.answer);const cur=userAns[q.id];
-      const isMulti=correct.length>1;
-      q.options.forEach((opt,i)=>{
-        const row=document.createElement('label');row.className='opt';
-        const ip=document.createElement('input');ip.type=isMulti?'checkbox':'radio';ip.name='opt';ip.value=i;
-        if(isMulti&&isArray(cur)&&cur.includes(i))ip.checked=true;if(!isMulti&&cur===i)ip.checked=true;
-        ip.addEventListener('change',()=>{
-          if(isMulti){const now=new Set(isArray(userAns[q.id])?userAns[q.id]:[]);if(ip.checked)now.add(i);else now.delete(i);userAns[q.id]=[...now].sort((a,b)=>a-b);}
-          else userAns[q.id]=i;
-          renderExplain(q);markOptions();
+      $('#qTags').innerHTML=q.section?`<span class="tag">${q.section}</span>`:'';
+
+      const correct = normalizeAnswer(q.answer);
+      const isMulti = correct.length>1;
+      const box=$('#optBox'); box.innerHTML='';
+
+      const cur = normalizeAnswer(userSel[q.id]);
+
+      (q.options||[]).forEach((opt,i)=>{
+        const row=document.createElement('label'); row.className='opt';
+        const ip=document.createElement('input'); ip.type=isMulti?'checkbox':'radio'; ip.name='opt'; ip.value=i;
+
+        // 已選狀態
+        if(isMulti && cur.includes(i)) { ip.checked=true; row.classList.add('selected'); }
+        if(!isMulti && cur[0]===i) { ip.checked=true; row.classList.add('selected'); }
+
+        // 點整塊即可作答
+        row.addEventListener('click',(e)=>{
+          // 避免雙觸發
+          if(e.target.tagName.toLowerCase()!=='input'){ ip.checked = !ip.checked; }
+
+          if(isMulti){
+            const now = new Set(normalizeAnswer(userSel[q.id]));
+            if(ip.checked) now.add(i); else now.delete(i);
+            userSel[q.id]=[...now].sort((a,b)=>a-b);
+            // 多選：不自動提交；維持 showAnswer 現狀
+          }else{
+            userSel[q.id]=i;
+            submitted[q.id]=true;       // 單選：點即作答
+            showAnswer=true;            // 立即顯示正解
+            // 取消其他選項的選取外觀
+            box.querySelectorAll('.opt').forEach(el=>el.classList.remove('selected'));
+          }
+          row.classList.toggle('selected', ip.checked);
+
+          renderExplain(q);
+          markOptions();
         });
-        const text=document.createElement('div');text.innerHTML=`<b>${String.fromCharCode(65+i)}.</b> ${opt}`;
-        row.appendChild(ip);row.appendChild(text);box.appendChild(row);
+
+        const text=document.createElement('div'); text.innerHTML=`<b>${String.fromCharCode(65+i)}.</b> ${opt}`;
+        row.appendChild(ip); row.appendChild(text); box.appendChild(row);
       });
-      $('#answerInput').value='';
-      renderExplain(q);markOptions();
+
+      renderExplain(q);
+      markOptions();
+
       function markOptions(){
         const rows=box.querySelectorAll('.opt');
         rows.forEach((row,i)=>{
+          row.classList.remove('correct','wrong');
+          row.style.borderColor='var(--border)';
           if(showAnswer){
-            if(correct.includes(i))row.style.borderColor='#22c55e';
-            else if((isArray(userAns[q.id])&&userAns[q.id].includes(i))||userAns[q.id]===i)
-              row.style.borderColor='#f43f5e';
-            else row.style.borderColor='#1f2937';
-          }else row.style.borderColor='#1f2937';
+            if(correct.includes(i)) row.classList.add('correct');
+            else {
+              const cur=normalizeAnswer(userSel[q.id]);
+              if(cur.includes(i)) row.classList.add('wrong');
+            }
+          }
         });
       }
     }
 
+    function normalizeAnswer(a){ if(a==null) return []; if(isArray(a)) return [...a].sort((x,y)=>x-y); return [a]; }
+    function sameArray(a,b){ a=normalizeAnswer(a); b=normalizeAnswer(b); if(a.length!==b.length) return false; return a.every((v,i)=>v===b[i]); }
+    function shuffle(arr){ return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]); }
+
     function renderExplain(q){
       const dst=$('#exp');
-      const correct=normalizeAnswer(q.answer);
-      const label=correct.map(i=>String.fromCharCode(65+i)).join(', ');
-      const cur=userAns[q.id];
-      const isRight=sameArray(cur,correct);
-      dst.innerHTML=`<p>正確答案：<b>${label}</b> ${isRight?'✅':cur==null?'':'❌'}</p>`+(q.explanation?`<div class="note">${q.explanation}</div>`:'');
+      const correct = normalizeAnswer(q.answer);
+      const label = correct.map(i=>String.fromCharCode(65+i)).join(', ');
+      const cur = normalizeAnswer(userSel[q.id]);
+      const isRight = cur.length>0 && sameArray(cur, correct);
+
+      dst.innerHTML =
+        `<p>正確答案：<b>${label || '（未設定）'}</b> ${
+          (submitted[q.id] || showAnswer) ? (isRight?'✅': (cur.length? '❌':'') ) : ''
+        }</p>` +
+        (q.explanation ? `<div class="note">${q.explanation}</div>` : '<div class="note">（此題暫無解析）</div>');
     }
   </script>
 </body>
