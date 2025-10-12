@@ -1,258 +1,218 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>大乘起信論｜刷題小程式 v1.8（精簡互動版）</title>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <style>
-    :root{
-      --bg:#0b1220;--card:#0f172a;--ink:#e2e8f0;
-      --muted:#94a3b8;--brand:#38bdf8;--accent:#22c55e;--danger:#f43f5e;
-      --border:#1f2937;
-    }
-    *{box-sizing:border-box;}
-    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,"Noto Sans TC",sans-serif;background:linear-gradient(180deg,#0b1220,#0a1020);color:var(--ink);}
-    .wrap{max-width:960px;margin:10px auto;padding:10px}
-    .title h1{font-size:22px;margin:0}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
-    select,button,input[type="number"],input[type="url"]{padding:6px 8px;border-radius:8px;border:1px solid #334155;background:#0b1220;color:var(--ink)}
-    button{cursor:pointer}
-    .btn{background:#0b1328;border:1px solid #2c3e50}
-    .btn:hover{border-color:#64748b}
-    .btn.brand{border-color:#0ea5e9;background:#0b1b2e}
-    .note{color:var(--muted);font-size:12px}
-    .tag{font-size:12px;color:#0b1220;background:#a5f3fc;border-radius:999px;padding:3px 6px}
-    .footer{opacity:.7;font-size:11px;margin-top:10px;text-align:center;}
-
-    /* 文字比例（清楚 + 緊湊） */
-    .question{font-size:clamp(18px,3vw,21px);line-height:1.6;margin:4px 0 6px;font-weight:600;}
-
-    /* 選項（整塊可點） */
-    #optBox{margin-top:2px}
-    .opt{display:flex;align-items:flex-start;gap:8px;border:1px solid var(--border);background:#0b1328;border-radius:9px;padding:6px 9px;margin:3px 0;font-size:clamp(17px,2.6vw,20px);line-height:1.45;transition:border-color .15s,background .15s}
-    .opt input{margin-top:3px}
-    .opt:hover{border-color:#3b82f6}
-    .opt.selected{background:#0d2236;border-color:#3b82f6}
-    .opt.correct{border-color:var(--accent)}
-    .opt.wrong{border-color:var(--danger)}
-
-    /* 解析區（與控制鍵同級字體） */
-    #expBox{font-size:clamp(16px,2.5vw,19px);line-height:1.55;background:#101828;border-radius:9px;padding:8px 10px;margin-top:6px}
-    #expBox p{margin:0 0 6px 0;font-weight:600}
-    #expBox .note{color:#cbd5e1;font-size:clamp(16px,2.5vw,19px);line-height:1.5}
-
-    /* 控制鍵字體放大到與解析一致 */
-    .controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;justify-content:center}
-    .controls button{font-size:clamp(16px,2.5vw,19px);padding:8px 10px;border-radius:8px}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>大乘起信論｜刷題小程式 v1.9（延遲顯示正解版）</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#0b1220;--card:#0f172a;--ink:#e2e8f0;--muted:#94a3b8;
+--brand:#38bdf8;--accent:#22c55e;--danger:#f43f5e;--border:#1f2937;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans TC",sans-serif;background:#0b1220;color:var(--ink);}
+.wrap{max-width:960px;margin:10px auto;padding:10px}
+.title h1{font-size:22px;margin:0}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+select,button,input[type="number"],input[type="url"]{padding:6px 8px;border-radius:8px;border:1px solid #334155;background:#0b1220;color:var(--ink)}
+button{cursor:pointer}
+.btn{background:#0b1328;border:1px solid #2c3e50}
+.btn:hover{border-color:#64748b}
+.btn.brand{border-color:#0ea5e9;background:#0b1b2e}
+.note{color:var(--muted);font-size:12px}
+.tag{font-size:12px;color:#0b1220;background:#a5f3fc;border-radius:999px;padding:3px 6px}
+.footer{opacity:.7;font-size:11px;margin-top:10px;text-align:center}
+.question{font-size:clamp(18px,3vw,21px);line-height:1.6;margin:4px 0 6px;font-weight:600;}
+#optBox{margin-top:2px}
+.opt{display:flex;align-items:flex-start;gap:8px;border:1px solid var(--border);
+background:#0b1328;border-radius:9px;padding:6px 9px;margin:3px 0;
+font-size:clamp(17px,2.6vw,20px);line-height:1.45;transition:border-color .15s,background .15s}
+.opt input{margin-top:3px}
+.opt:hover{border-color:#3b82f6}
+.opt.selected{background:#0d2236;border-color:#3b82f6}
+.opt.correct{border-color:var(--accent)}
+.opt.wrong{border-color:var(--danger)}
+#expBox{font-size:clamp(16px,2.5vw,19px);line-height:1.55;background:#101828;
+border-radius:9px;padding:8px 10px;margin-top:6px;display:none;}
+#expBox.active{display:block;}
+#expBox p{margin:0 0 6px 0;font-weight:600}
+#expBox .note{color:#cbd5e1;font-size:clamp(16px,2.5vw,19px);line-height:1.5}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;justify-content:center}
+.controls button{font-size:clamp(16px,2.5vw,19px);padding:8px 10px;border-radius:8px}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="title">
-      <h1>《大乘起信論》刷題小程式 <span class="note">— v1.8 精簡互動版</span></h1>
-    </div>
+<div class="wrap">
+  <div class="title"><h1>《大乘起信論》刷題小程式 <span class="note">— v1.9 延遲顯示正解</span></h1></div>
 
-    <!-- 題庫設定 -->
-    <div class="card" id="panel-setup">
-      <label>題庫來源</label><br>
-      <select id="sourceSel">
-        <option value="builtin">內建示例題庫</option>
-        <option value="upload">上傳 JSON 題庫</option>
-        <option value="excel">上傳 Excel (.xlsx)</option>
-        <option value="url">輸入遠端 JSON 連結</option>
-      </select>
-      <input type="file" id="filePickerJson" accept="application/json" class="hidden"/>
-      <input type="file" id="filePickerXlsx" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xlsx" class="hidden"/>
-      <input type="url" id="urlInput" class="hidden" placeholder="https://…/questions.json" style="width:240px"/>
-      <button class="btn" id="btnLoad">載入題庫</button>
-      <hr>
-      <label>出題數量</label><br>
-      <input type="number" id="countInp" min="1" max="200" value="10"><br><br>
-      <button class="btn brand" id="btnStart">開始作答 ▶</button>
-    </div>
-
-    <!-- 題目作答（點選即作答） -->
-    <div class="card" id="panel-quiz" style="display:none">
-      <div id="qTags"></div>
-      <div id="qNo"></div>
-      <div class="question" id="qText"></div>
-      <div id="optBox"></div>
-
-      <details id="expBox" open>
-        <summary>解析 / 正解</summary>
-        <div id="exp"></div>
-      </details>
-
-      <div class="controls">
-        <button class="btn" id="btnPrev">← 上一題</button>
-        <button class="btn" id="btnShow">顯示/隱藏 答案</button>
-        <button class="btn" id="btnNext">下一題 →</button>
-      </div>
-    </div>
-
-    <div class="footer">© 2025 刷題小程式 v1.8 — 可點選作答 / JSON・Excel 題庫</div>
+  <div class="card" id="panel-setup">
+    <label>題庫來源</label><br>
+    <select id="sourceSel">
+      <option value="builtin">內建示例題庫</option>
+      <option value="upload">上傳 JSON 題庫</option>
+      <option value="excel">上傳 Excel (.xlsx)</option>
+      <option value="url">輸入遠端 JSON 連結</option>
+    </select>
+    <input type="file" id="filePickerJson" accept="application/json" class="hidden"/>
+    <input type="file" id="filePickerXlsx" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xlsx" class="hidden"/>
+    <input type="url" id="urlInput" class="hidden" placeholder="https://…/questions.json" style="width:240px"/>
+    <button class="btn" id="btnLoad">載入題庫</button>
+    <hr>
+    <label>出題數量</label><br>
+    <input type="number" id="countInp" min="1" max="200" value="10"><br><br>
+    <button class="btn brand" id="btnStart">開始作答 ▶</button>
   </div>
 
-  <script>
-    const BUILTIN=[
-      {id:1,section:"總說",question:"《大乘起信論》依什麼雙門立論以統攝教義？",options:["心真如門與心生滅門","空門與假門","因門與果門","性門與相門"],answer:0,explanation:"本論以『心真如門』『心生滅門』二門統攝一切法。"},
-      {id:2,section:"總說",question:"本論所說『一心二門』中，生滅因依於何者而起？",options:["依於無明自體","依於如來藏真如","依於業力","依於阿賴耶識"],answer:1,explanation:"生滅門不離真如而起，喻如波依水。"},
-      {id:3,section:"五重玄義",question:"作者馬鳴菩薩立論之宗旨，最核心在顯示什麼？",options:["唯識無境","真如不變隨緣","空假中三觀","戒定慧三學"],answer:1,explanation:"宗旨在『不變隨緣』以會通有無，令歸一心。"}
-    ];
+  <div class="card" id="panel-quiz" style="display:none">
+    <div id="qTags"></div>
+    <div id="qNo"></div>
+    <div class="question" id="qText"></div>
+    <div id="optBox"></div>
 
-    const $=s=>document.querySelector(s);
-    let bank=[],idx=0,paper=[],userSel={},showAnswer=false,submitted={};
-    const isArray=Array.isArray;
+    <details id="expBox">
+      <summary>解析 / 正解</summary>
+      <div id="exp"></div>
+    </details>
 
-    function normalizeAnswer(a){ if(a==null) return []; if(isArray(a)) return [...a].sort((x,y)=>x-y); return [a]; }
-    function sameArray(a,b){ a=normalizeAnswer(a); b=normalizeAnswer(b); if(a.length!==b.length) return false; return a.every((v,i)=>v===b[i]); }
-    function shuffle(arr){ return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]); }
+    <div class="controls">
+      <button class="btn" id="btnPrev">← 上一題</button>
+      <button class="btn" id="btnShow">顯示/隱藏 答案</button>
+      <button class="btn" id="btnNext">下一題 →</button>
+    </div>
+  </div>
+  <div class="footer">© 2025 刷題小程式 v1.9 — 延遲顯示正解 / JSON・Excel 題庫</div>
+</div>
 
-    // 題庫載入
-    const sourceSel=$('#sourceSel'), filePickerJson=$('#filePickerJson'), filePickerXlsx=$('#filePickerXlsx'), urlInput=$('#urlInput');
-    sourceSel.addEventListener('change',()=>{
-      const v=sourceSel.value;
-      filePickerJson.classList.toggle('hidden', v!=='upload');
-      filePickerXlsx.classList.toggle('hidden', v!=='excel');
-      urlInput.classList.toggle('hidden', v!=='url');
-    });
-    $('#btnLoad').addEventListener('click',async()=>{
-      try{
-        const v=sourceSel.value;
-        if(v==='builtin'){ bank=JSON.parse(JSON.stringify(BUILTIN)); alert(`載入完成：${bank.length}題`); }
-        else if(v==='upload'){ filePickerJson.click(); return; }
-        else if(v==='excel'){ filePickerXlsx.click(); return; }
-        else if(v==='url'){ const url=urlInput.value.trim(); if(!url) return alert('請輸入連結'); const res=await fetch(url); bank=await res.json(); alert(`載入完成：${bank.length}題`); }
-      }catch(e){ alert('載入失敗：'+e.message); }
-    });
-    filePickerJson.addEventListener('change',async(e)=>{
-      const f=e.target.files?.[0]; if(!f) return;
-      try{ bank=JSON.parse(await f.text()); alert(`載入完成：${bank.length}題`); }catch{ alert('JSON 解析失敗'); }
-    });
-    filePickerXlsx.addEventListener('change',async(e)=>{
-      const f=e.target.files?.[0]; if(!f) return;
-      const reader=new FileReader();
-      reader.onload=(evt)=>{
-        try{
-          const data=new Uint8Array(evt.target.result);
-          const wb=XLSX.read(data,{type:'array'}), ws=wb.Sheets[wb.SheetNames[0]];
-          const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
-          bank=rows.map((r,i)=>{
-            const ABC={A:0,B:1,C:2,D:3};
-            const opts=[r.optionA,r.optionB,r.optionC,r.optionD].filter(Boolean);
-            let ans=String(r.answer||'').split(',').map(s=>s.trim().toUpperCase()).map(a=>ABC[a]).filter(v=>v!==undefined);
-            if(ans.length===1) ans=ans[0];
-            return {id:Number(r.id||i+1),section:String(r.section||''),question:String(r.question||''),options:opts,answer:ans,explanation:String(r.explanation||'')};
-          });
-          alert(`Excel 匯入完成：${bank.length}題`);
-        }catch(err){ alert('Excel 解析失敗：'+err.message); }
-      };
-      reader.readAsArrayBuffer(f);
-    });
+<script>
+const BUILTIN=[
+  {id:1,section:"總說",question:"《大乘起信論》依什麼雙門立論以統攝教義？",options:["心真如門與心生滅門","空門與假門","因門與果門","性門與相門"],answer:0,explanation:"本論以『心真如門』『心生滅門』二門統攝一切法。"},
+  {id:2,section:"總說",question:"本論所說『一心二門』中，生滅因依於何者而起？",options:["依於無明自體","依於如來藏真如","依於業力","依於阿賴耶識"],answer:1,explanation:"生滅門不離真如而起，喻如波依水。"},
+  {id:3,section:"五重玄義",question:"作者馬鳴菩薩立論之宗旨，最核心在顯示什麼？",options:["唯識無境","真如不變隨緣","空假中三觀","戒定慧三學"],answer:1,explanation:"宗旨在『不變隨緣』以會通有無，令歸一心。"}
+];
+const $=s=>document.querySelector(s);
+let bank=[],idx=0,paper=[],userSel={},showAnswer=false,submitted={};
+const isArray=Array.isArray;
+function normalizeAnswer(a){if(a==null)return[];if(isArray(a))return[...a].sort((x,y)=>x-y);return[a];}
+function sameArray(a,b){a=normalizeAnswer(a);b=normalizeAnswer(b);if(a.length!==b.length)return false;return a.every((v,i)=>v===b[i]);}
+function shuffle(arr){return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);}
 
-    // 開始作答
-    $('#btnStart').addEventListener('click',()=>{
-      if(!bank.length){
-        if(confirm('尚未載入題庫，是否改用內建示例？')) bank=JSON.parse(JSON.stringify(BUILTIN)); else return;
-      }
-      const want=parseInt($('#countInp').value||'10',10);
-      paper=shuffle(bank.map((_,i)=>i)).slice(0,want);
-      idx=0; userSel={}; submitted={}; showAnswer=false;
-      $('#panel-setup').style.display='none';
-      $('#panel-quiz').style.display='block';
-      render();
-    });
-
-    // 控制鈕
-    $('#btnPrev').addEventListener('click',()=>{ if(idx>0){ idx--; showAnswer=!!submitted[bank[paper[idx]].id]; render(); }});
-    $('#btnNext').addEventListener('click',()=>{ if(idx<paper.length-1){ idx++; showAnswer=!!submitted[bank[paper[idx]].id]; render(); }});
-    $('#btnShow').addEventListener('click',()=>{ showAnswer=!showAnswer; render(); });
-
-    // 渲染
-    function render(){
-      const q=bank[paper[idx]]; if(!q) return;
-      $('#qNo').textContent=`第 ${idx+1} / ${paper.length} 題`;
-      $('#qText').textContent=q.question;
-      $('#qTags').innerHTML=q.section?`<span class="tag">${q.section}</span>`:'';
-
-      const correct = normalizeAnswer(q.answer);
-      const isMulti = correct.length>1;
-      const box=$('#optBox'); box.innerHTML='';
-
-      const cur = normalizeAnswer(userSel[q.id]);
-
-      (q.options||[]).forEach((opt,i)=>{
-        const row=document.createElement('label'); row.className='opt';
-        const ip=document.createElement('input'); ip.type=isMulti?'checkbox':'radio'; ip.name='opt'; ip.value=i;
-
-        // 已選狀態
-        if(isMulti && cur.includes(i)) { ip.checked=true; row.classList.add('selected'); }
-        if(!isMulti && cur[0]===i) { ip.checked=true; row.classList.add('selected'); }
-
-        // 點整塊即可作答
-        row.addEventListener('click',(e)=>{
-          // 避免雙觸發
-          if(e.target.tagName.toLowerCase()!=='input'){ ip.checked = !ip.checked; }
-
-          if(isMulti){
-            const now = new Set(normalizeAnswer(userSel[q.id]));
-            if(ip.checked) now.add(i); else now.delete(i);
-            userSel[q.id]=[...now].sort((a,b)=>a-b);
-            // 多選：不自動提交；維持 showAnswer 現狀
-          }else{
-            userSel[q.id]=i;
-            submitted[q.id]=true;       // 單選：點即作答
-            showAnswer=true;            // 立即顯示正解
-            // 取消其他選項的選取外觀
-            box.querySelectorAll('.opt').forEach(el=>el.classList.remove('selected'));
-          }
-          row.classList.toggle('selected', ip.checked);
-
-          renderExplain(q);
-          markOptions();
-        });
-
-        const text=document.createElement('div'); text.innerHTML=`<b>${String.fromCharCode(65+i)}.</b> ${opt}`;
-        row.appendChild(ip); row.appendChild(text); box.appendChild(row);
+// 題庫載入
+const sourceSel=$('#sourceSel'),filePickerJson=$('#filePickerJson'),filePickerXlsx=$('#filePickerXlsx'),urlInput=$('#urlInput');
+sourceSel.addEventListener('change',()=>{const v=sourceSel.value;
+filePickerJson.classList.toggle('hidden',v!=='upload');
+filePickerXlsx.classList.toggle('hidden',v!=='excel');
+urlInput.classList.toggle('hidden',v!=='url');});
+$('#btnLoad').addEventListener('click',async()=>{
+try{
+  const v=sourceSel.value;
+  if(v==='builtin'){bank=JSON.parse(JSON.stringify(BUILTIN));alert(`載入完成：${bank.length}題`);}
+  else if(v==='upload'){filePickerJson.click();return;}
+  else if(v==='excel'){filePickerXlsx.click();return;}
+  else if(v==='url'){const url=urlInput.value.trim();if(!url)return alert('請輸入連結');const res=await fetch(url);bank=await res.json();alert(`載入完成：${bank.length}題`);}
+}catch(e){alert('載入失敗：'+e.message);}
+});
+filePickerJson.addEventListener('change',async(e)=>{
+  const f=e.target.files?.[0];if(!f)return;
+  try{bank=JSON.parse(await f.text());alert(`載入完成：${bank.length}題`);}catch{alert('JSON 解析失敗');}});
+filePickerXlsx.addEventListener('change',async(e)=>{
+  const f=e.target.files?.[0];if(!f)return;
+  const reader=new FileReader();
+  reader.onload=(evt)=>{
+    try{
+      const data=new Uint8Array(evt.target.result);
+      const wb=XLSX.read(data,{type:'array'}),ws=wb.Sheets[wb.SheetNames[0]];
+      const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+      const ABC={A:0,B:1,C:2,D:3};
+      bank=rows.map((r,i)=>{
+        const opts=[r.optionA,r.optionB,r.optionC,r.optionD].filter(Boolean);
+        let ans=String(r.answer||'').split(',').map(s=>s.trim().toUpperCase()).map(a=>ABC[a]).filter(v=>v!==undefined);
+        if(ans.length===1)ans=ans[0];
+        return{id:Number(r.id||i+1),section:String(r.section||''),question:String(r.question||''),options:opts,answer:ans,explanation:String(r.explanation||'')};
       });
+      alert(`Excel 匯入完成：${bank.length}題`);
+    }catch(err){alert('Excel 解析失敗：'+err.message);}
+  };
+  reader.readAsArrayBuffer(f);
+});
 
+// 開始作答
+$('#btnStart').addEventListener('click',()=>{
+  if(!bank.length){if(confirm('尚未載入題庫，是否改用內建示例？'))bank=JSON.parse(JSON.stringify(BUILTIN));else return;}
+  const want=parseInt($('#countInp').value||'10',10);
+  paper=shuffle(bank.map((_,i)=>i)).slice(0,want);
+  idx=0;userSel={};submitted={};showAnswer=false;
+  $('#panel-setup').style.display='none';
+  $('#panel-quiz').style.display='block';
+  render();
+});
+
+// 控制鈕
+$('#btnPrev').addEventListener('click',()=>{if(idx>0){idx--;showAnswer=!!submitted[bank[paper[idx]].id];render();}});
+$('#btnNext').addEventListener('click',()=>{if(idx<paper.length-1){idx++;showAnswer=!!submitted[bank[paper[idx]].id];render();}});
+$('#btnShow').addEventListener('click',()=>{showAnswer=!showAnswer;render();});
+
+// 渲染
+function render(){
+  const q=bank[paper[idx]];if(!q)return;
+  $('#qNo').textContent=`第 ${idx+1} / ${paper.length} 題`;
+  $('#qText').textContent=q.question;
+  $('#qTags').innerHTML=q.section?`<span class="tag">${q.section}</span>`:'';
+  const correct=normalizeAnswer(q.answer);
+  const isMulti=correct.length>1;
+  const box=$('#optBox');box.innerHTML='';
+  const cur=normalizeAnswer(userSel[q.id]);
+  (q.options||[]).forEach((opt,i)=>{
+    const row=document.createElement('label');row.className='opt';
+    const ip=document.createElement('input');ip.type=isMulti?'checkbox':'radio';ip.name='opt';ip.value=i;
+    if(isMulti&&cur.includes(i))ip.checked=true;if(!isMulti&&cur[0]===i)ip.checked=true;
+    row.addEventListener('click',(e)=>{
+      if(e.target.tagName.toLowerCase()!=='input'){ip.checked=!ip.checked;}
+      if(isMulti){
+        const now=new Set(normalizeAnswer(userSel[q.id]));
+        if(ip.checked)now.add(i);else now.delete(i);
+        userSel[q.id]=[...now].sort((a,b)=>a-b);
+      }else{
+        userSel[q.id]=i;
+        submitted[q.id]=true; // 點選後才顯示答案
+        showAnswer=true;
+      }
       renderExplain(q);
       markOptions();
-
-      function markOptions(){
-        const rows=box.querySelectorAll('.opt');
-        rows.forEach((row,i)=>{
-          row.classList.remove('correct','wrong');
-          row.style.borderColor='var(--border)';
-          if(showAnswer){
-            if(correct.includes(i)) row.classList.add('correct');
-            else {
-              const cur=normalizeAnswer(userSel[q.id]);
-              if(cur.includes(i)) row.classList.add('wrong');
-            }
-          }
-        });
+    });
+    const text=document.createElement('div');text.innerHTML=`<b>${String.fromCharCode(65+i)}.</b> ${opt}`;
+    row.appendChild(ip);row.appendChild(text);box.appendChild(row);
+  });
+  renderExplain(q);markOptions();
+  function markOptions(){
+    const rows=box.querySelectorAll('.opt');
+    rows.forEach((row,i)=>{
+      row.classList.remove('correct','wrong');
+      row.style.borderColor='var(--border)';
+      if(submitted[q.id]||showAnswer){
+        const correct=normalizeAnswer(q.answer);
+        if(correct.includes(i))row.classList.add('correct');
+        else{
+          const cur=normalizeAnswer(userSel[q.id]);
+          if(cur.includes(i))row.classList.add('wrong');
+        }
       }
-    }
+    });
+  }
+}
 
-    function normalizeAnswer(a){ if(a==null) return []; if(isArray(a)) return [...a].sort((x,y)=>x-y); return [a]; }
-    function sameArray(a,b){ a=normalizeAnswer(a); b=normalizeAnswer(b); if(a.length!==b.length) return false; return a.every((v,i)=>v===b[i]); }
-    function shuffle(arr){ return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]); }
-
-    function renderExplain(q){
-      const dst=$('#exp');
-      const correct = normalizeAnswer(q.answer);
-      const label = correct.map(i=>String.fromCharCode(65+i)).join(', ');
-      const cur = normalizeAnswer(userSel[q.id]);
-      const isRight = cur.length>0 && sameArray(cur, correct);
-
-      dst.innerHTML =
-        `<p>正確答案：<b>${label || '（未設定）'}</b> ${
-          (submitted[q.id] || showAnswer) ? (isRight?'✅': (cur.length? '❌':'') ) : ''
-        }</p>` +
-        (q.explanation ? `<div class="note">${q.explanation}</div>` : '<div class="note">（此題暫無解析）</div>');
-    }
-  </script>
+function renderExplain(q){
+  const dst=$('#exp'),expBox=$('#expBox');
+  const correct=normalizeAnswer(q.answer);
+  const label=correct.map(i=>String.fromCharCode(65+i)).join(', ');
+  const cur=normalizeAnswer(userSel[q.id]);
+  const isRight=cur.length>0&&sameArray(cur,correct);
+  if(submitted[q.id]||showAnswer){
+    expBox.classList.add('active');
+    dst.innerHTML=`<p>正確答案：<b>${label||'（未設定）'}</b> ${isRight?'✅':cur.length?'❌':''}</p>`+(q.explanation?`<div class="note">${q.explanation}</div>`:'');
+  }else{
+    expBox.classList.remove('active');
+    dst.innerHTML='';
+  }
+}
+</script>
 </body>
 </html>
