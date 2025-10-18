@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>線上刷題小程序｜老師可編輯版 v3.6</title>
+<title>線上刷題小程序｜老師可編輯版 v3.7</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{
@@ -76,8 +76,8 @@ textarea{width:100%;min-height:360px;border:1px solid var(--line);border-radius:
   <div class="card">
     <div class="row" style="justify-content:space-between;align-items:center">
       <div>
-        <h1>線上刷題小程序 <span class="sub">— 老師可編輯版 v3.6</span></h1>
-        <div class="sub">預設為學員模式；點右上角齒輪輸入密碼才能看到老師模式。</div>
+        <h1>線上刷題小程序 <span class="sub">— 老師可編輯版 v3.7</span></h1>
+        <div class="sub">預設為學員模式；點右上角齒輪輸入密碼才能看到老師模式。學員端使用雲端題庫。</div>
       </div>
       <button id="btnGear" class="gear" title="老師模式">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -88,21 +88,17 @@ textarea{width:100%;min-height:360px;border:1px solid var(--line);border-radius:
     </div>
   </div>
 
-  <!-- 老師模式（預設隱藏） -->
+  <!-- 老師模式（精簡版；預設隱藏） -->
   <div class="card hidden" id="panel-teacher">
     <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:6px">
-      <div class="sub">老師模式已解鎖（本分頁有效）。</div>
+      <div class="sub">老師模式已解鎖（本分頁有效）。學員端僅讀雲端題庫。</div>
       <button class="btn ghost" id="btnBackStudent">返回學員模式</button>
     </div>
-    <div class="row">
+    <div class="row" style="gap:8px;flex-wrap:wrap">
       <input id="filePicker" type="file" accept=".json,application/json,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
       <button class="btn" id="btnImport">匯入（JSON/Excel）</button>
-      <button class="btn" id="btnValidate">驗證格式</button>
       <button class="btn brand" id="btnApply">套用到預覽</button>
-      <button class="btn" id="btnSaveLocal">存到本機</button>
-      <button class="btn" id="btnLoadLocal">讀取本機</button>
       <button class="btn ghost" id="btnDownload">下載 questions.json</button>
-      <button class="btn danger" id="btnClearLocal">清除本機暫存</button>
     </div>
     <div class="hr"></div>
     <div class="editor">
@@ -113,7 +109,8 @@ textarea{width:100%;min-height:360px;border:1px solid var(--line);border-radius:
 ]'></textarea>
         <div class="help" style="margin-top:6px">
           JSON 欄位：<code>id, section, question, options(array), answer(number 或 array), explanation</code>。<br>
-          Excel 欄位：<code>id, section, question, optionA~F, answer(如 A 或 A,C), explanation</code>。
+          Excel 欄位：<code>id, section, question, optionA~D（是非題 A=是、B=否）, answer(如 A), explanation</code>。<br>
+          注意：本頁僅預覽與輸出 JSON，<b>學員端實際題庫來自雲端</b>（GitHub Pages）。
         </div>
       </div>
       <div>
@@ -129,13 +126,30 @@ textarea{width:100%;min-height:360px;border:1px solid var(--line);border-radius:
 </div>
 
 <script>
+/* ====== 雲端題庫設定（請確認 questions.json 放在同一資料夾） ====== */
+const REMOTE_JSON = "https://jianhan00.github.io/qstest/questions.json";
+/* 僅讀雲端題庫（true：學員端忽略本機暫存；遠端失敗才用 DEFAULT） */
+const FORCE_REMOTE_BANK = true;
+const CACHE_BUST = () => `cb=${Date.now()}`;
+async function fetchRemoteBank() {
+  try{
+    const url = REMOTE_JSON + (REMOTE_JSON.includes('?') ? '&' : '?') + CACHE_BUST();
+    const r = await fetch(url, { cache: 'no-store' });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const data = await r.json();
+    if(!Array.isArray(data)) throw new Error('遠端題庫不是陣列');
+    return data;
+  }catch(e){
+    console.warn('抓取雲端題庫失敗：', e);
+    return null;
+  }
+}
+
 /* ====== 基本工具 ====== */
 const $=s=>document.querySelector(s);
 const isArray=Array.isArray;
-const storeKey='qs_bank_v36';
-const authKey='qs_teacher_ok_v36';
-
-/* 老師模式密碼（可自行更改） */
+const storeKey='qs_bank_v37';
+const authKey='qs_teacher_ok_v37';
 const TEACHER_PASSWORD = 'teacher123';
 
 function normalize(a){ if(a==null) return []; return isArray(a)? [...a].sort((x,y)=>x-y) : [a]; }
@@ -143,20 +157,23 @@ function same(a,b){ a=normalize(a); b=normalize(b); return a.length===b.length &
 function shuffle(arr){ return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]); }
 function download(filename, text){ const blob=new Blob([text],{type:'application/json;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; a.click(); URL.revokeObjectURL(a.href); }
 
-/* 預設題庫（無暫存時用） */
+/* 預設題庫（僅作為雲端失敗時的安全網） */
 const DEFAULT = [
   {"id":1,"section":"總說","question":"《大乘起信論》依什麼雙門立論以統攝教義？","options":["心真如門與心生滅門","空門與假門","因門與果門","性門與相門"],"answer":0,"explanation":"本論以「心真如門」「心生滅門」二門統攝一切法。"},
   {"id":2,"section":"總說","question":"本論所說「一心二門」中，生滅因依於何者而起？","options":["依於無明自體","依於如來藏真如","依於業力","依於阿賴耶識"],"answer":1,"explanation":"生滅門不離真如而起，喻如波依水。"},
   {"id":3,"section":"五重玄義","question":"作者馬鳴菩薩立論之宗旨，最核心在顯示什麼？","options":["唯識無境","真如不變隨緣","空假中三觀","戒定慧三學"],"answer":1,"explanation":"宗旨在「不變隨緣」以會通有無，令歸一心。"}
 ];
-
 let BANK=[];
 
-/* ====== 啟動：預設學員模式、載入題庫 ====== */
-(function bootstrap(){
-  const cached=localStorage.getItem(storeKey);
-  if(cached){ try{ BANK=JSON.parse(cached);}catch{BANK=DEFAULT;} }
-  else { BANK=DEFAULT; }
+/* ====== 啟動：優先載入雲端題庫 ====== */
+(async function bootstrap(){
+  let remote = await fetchRemoteBank();
+  if (FORCE_REMOTE_BANK) {
+    BANK = remote || DEFAULT;
+  } else {
+    const cached = localStorage.getItem(storeKey);
+    BANK = remote || (cached ? (()=>{ try{return JSON.parse(cached)}catch{return DEFAULT} })() ) || DEFAULT;
+  }
 
   $('#editor').value = JSON.stringify(BANK, null, 2);
 
@@ -177,21 +194,17 @@ let BANK=[];
       refreshStudent('#student-preview');
     }
   };
-  // 老師模式中的「返回學員模式」
+  // 老師模式 → 返回學員模式
   $('#btnBackStudent').onclick = ()=>{
     $('#panel-teacher').classList.add('hidden');
     $('#panel-student').classList.remove('hidden');
     refreshStudent('#panel-student');
   };
 
-  // 老師端操作綁定
-  $('#btnImport').onclick = handleImport;
-  $('#btnValidate').onclick = validateJSON;
+  // 老師端操作綁定（精簡版）
+  $('#btnImport').onclick = handleImportSimple;
   $('#btnApply').onclick = applyToPreview;
-  $('#btnSaveLocal').onclick = saveLocal;
-  $('#btnLoadLocal').onclick = loadLocal;
   $('#btnDownload').onclick = ()=>download('questions.json', $('#editor').value);
-  $('#btnClearLocal').onclick = ()=>{ localStorage.removeItem(storeKey); alert('已清除 localStorage'); };
 })();
 
 /* ====== 密碼驗證（sessionStorage 單分頁有效） ====== */
@@ -205,37 +218,51 @@ async function ensureTeacherAuth(){
   return ok;
 }
 
-/* ====== 匯入 JSON/Excel ====== */
-async function handleImport(){
-  const f=$('#filePicker').files?.[0];
+/* ====== 匯入（精簡版）：JSON/Excel -> editor；Excel 僅支援 A~D ====== */
+async function handleImportSimple(){
+  const f = $('#filePicker').files?.[0];
   if(!f){ alert('請先選擇檔案'); return; }
-  const name=f.name.toLowerCase();
+  const name = f.name.toLowerCase();
   try{
     if(name.endsWith('.json')){
-      const arr=JSON.parse(await f.text());
-      $('#editor').value=JSON.stringify(arr, null, 2);
-      alert(`已載入 JSON：${arr.length} 題`);
+      const arr = JSON.parse(await f.text());
+      $('#editor').value = JSON.stringify(arr, null, 2);
+      const ok = validateJSON();
+      if(ok) alert(`已載入 JSON，${arr.length} 題，格式檢查通過 ✅`);
     }else if(name.endsWith('.xlsx')){
-      const buf=await f.arrayBuffer();
-      const wb=XLSX.read(new Uint8Array(buf),{type:'array'});
-      const ws=wb.Sheets[wb.SheetNames[0]];
-      const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
-      const ABC={A:0,B:1,C:2,D:3,E:4,F:5};
-      const arr=rows.map((r,i)=>{
-        const opts=[r.optionA,r.optionB,r.optionC,r.optionD,r.optionE,r.optionF].filter(v=>v!==undefined && v!=='');
-        let ans=String(r.answer||'').split(',').map(s=>s.trim().toUpperCase()).map(a=>ABC[a]).filter(v=>v!==undefined);
-        if(ans.length===1) ans=ans[0];
-        return {id:Number(r.id||i+1),section:String(r.section||''),question:String(r.question||''),options:opts,answer:ans,explanation:String(r.explanation||'')};
+      const buf = await f.arrayBuffer();
+      const wb = XLSX.read(new Uint8Array(buf), {type:'array'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws,{defval:''});
+
+      const ABC = {A:0,B:1,C:2,D:3};
+      const arr = rows.map((r,i)=>{
+        const opts=[r.optionA,r.optionB,r.optionC,r.optionD].filter(v=>v!==undefined && v!=='');
+        let ans = String(r.answer||'').trim().toUpperCase();
+        if(ans.includes(',')) ans = ans.split(',')[0].trim(); // 僅單選：若誤填多個，只取第一個
+        const ansIdx = ABC[ans];
+        return {
+          id: Number(r.id || i+1),
+          section: String(r.section||''),
+          question: String(r.question||''),
+          options: opts,
+          answer: (typeof ansIdx==='number') ? ansIdx : 0,
+          explanation: String(r.explanation||'')
+        };
       });
-      $('#editor').value=JSON.stringify(arr, null, 2);
-      alert(`已由 Excel 轉入：${arr.length} 題`);
+
+      $('#editor').value = JSON.stringify(arr, null, 2);
+      const ok = validateJSON();
+      if(ok) alert(`已由 Excel 轉入：${arr.length} 題，格式檢查通過 ✅（只支援 A–D；是非題 A=是、B=否）`);
     }else{
       alert('僅支援 .json 或 .xlsx');
     }
-  }catch(e){ alert('匯入失敗：'+e.message); }
+  }catch(e){
+    alert('匯入失敗：'+ (e?.message || e));
+  }
 }
 
-/* ====== 驗證 / 套用 / 本機存取 ====== */
+/* ====== 驗證 / 套用到預覽（不影響學員端雲端題庫） ====== */
 function validateJSON(){
   try{
     const arr=JSON.parse($('#editor').value);
@@ -246,28 +273,14 @@ function validateJSON(){
       if(!Array.isArray(q.options) || q.options.length<2) throw new Error(`第 ${i+1} 筆 options 至少 2 個`);
       if(typeof q.answer==='undefined') throw new Error(`第 ${i+1} 筆缺少 answer`);
     }
-    alert('格式檢查通過 ✅');
     return arr;
   }catch(e){ alert('格式錯誤：'+e.message); return null; }
 }
 function applyToPreview(){
   const arr=validateJSON(); if(!arr) return;
-  BANK=arr; refreshStudent('#student-preview');
-  alert('已套用到預覽（右側學員區）。若要給學生用，直接切回學員模式。');
-}
-function saveLocal(){
-  const arr=validateJSON(); if(!arr) return;
-  localStorage.setItem(storeKey, JSON.stringify(arr));
-  alert('已儲存到本機（localStorage）。重新整理仍保留。');
-}
-function loadLocal(){
-  const txt=localStorage.getItem(storeKey);
-  if(!txt){ alert('本機沒有暫存資料'); return; }
-  try{
-    const arr=JSON.parse(txt);
-    $('#editor').value=JSON.stringify(arr, null, 2);
-    alert(`已載入本機暫存：${arr.length} 題`);
-  }catch{ alert('讀取失敗：本機資料格式不正確'); }
+  BANK=arr; // 僅更新右側預覽與上方學員預覽，不影響實際學員端雲端資料
+  refreshStudent('#student-preview');
+  alert('已套用到預覽（右側學員區）。如需讓所有學員看到，請把此 JSON 下載後上傳到 GitHub 的 questions.json。');
 }
 
 /* ====== 學員 UI（含章節篩選＋成績報告） ====== */
