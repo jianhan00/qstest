@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>線上刷題小程序｜老師可編輯版 v3.3</title>
+<title>線上刷題小程序｜老師可編輯版 v3.5</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{
@@ -27,6 +27,16 @@ button{cursor:pointer}
 .hr{height:1px;background:var(--line);margin:14px 0}
 .hidden{display:none}
 
+/* 齒輪按鈕（右上角） */
+.gear{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border-radius:999px;border:1px solid var(--line);
+  background:#fff;cursor:pointer;transition:box-shadow .15s,border-color .15s
+}
+.gear:hover{box-shadow:0 4px 12px rgba(15,23,42,.08);border-color:#c7d2fe}
+.gear svg{width:18px;height:18px}
+
+/* 題目/選項/回饋 */
 .question{font-size:20px;line-height:1.6;margin:6px 0 8px}
 .opt{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--line);border-radius:12px;padding:6px 8px;margin:3px 0;font-size:16px;line-height:1.4;background:#fff}
 .opt.correct{border-color:var(--ok)}
@@ -43,6 +53,7 @@ button{cursor:pointer}
 .report details{margin:6px 0}
 .report summary{cursor:pointer}
 
+/* 老師編輯區 */
 .editor{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 textarea{width:100%;min-height:360px;border:1px solid var(--line);border-radius:12px;padding:10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;background:#fbfdff}
 .help{font-size:12px;color:var(--muted)}
@@ -52,22 +63,29 @@ textarea{width:100%;min-height:360px;border:1px solid var(--line);border-radius:
 </head>
 <body>
 <div class="wrap">
-  <!-- 頂部 -->
+  <!-- 頂部：標題 + 齒輪（密碼入口） -->
   <div class="card">
-    <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="row" style="justify-content:space-between;align-items:center">
       <div>
-        <h1>線上刷題小程序 <span class="sub">— 老師可編輯版 v3.3</span></h1>
-        <div class="sub">在「老師模式」編輯題庫並套用；切到「學員模式」即可作答。題庫可下載為 <code>questions.json</code> 並存檔。</div>
+        <h1>線上刷題小程序 <span class="sub">— 老師可編輯版 v3.5</span></h1>
+        <div class="sub">預設為學員模式；點右上角齒輪輸入密碼才能看到老師模式。</div>
       </div>
-      <div class="row">
-        <label><input type="radio" name="role" value="teacher" checked> 老師模式</label>
-        <label><input type="radio" name="role" value="student"> 學員模式</label>
-      </div>
+      <button id="btnGear" class="gear" title="老師模式">
+        <!-- 小齒輪 SVG -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-width="2" d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/>
+          <path stroke-width="2" d="M19.4 15a1 1 0 0 0 .2 1.1l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1 1 0 0 0-1.1-.2 1 1 0 0 0-.6.9V20a2 2 0 1 1-4 0v-.1a1 1 0 0 0-.6-.9 1 1 0 0 0-1.1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1 1 0 0 0 .2-1.1 1 1 0 0 0-.9-.6H4a2 2 0 1 1 0-4h.1a1 1 0 0 0 .9-.6 1 1 0 0 0-.2-1.1l-.1-.1A2 2 0 1 1 7.6 4.8l.1.1a1 1 0 0 0 1.1.2H9a1 1 0 0 0 .6-.9V4a2 2 0 1 1 4 0v.1a1 1 0 0 0 .6.9 1 1 0 0 0 1.1-.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1 1 0 0 0-.2 1.1 1 1 0 0 0 .9.6H20a2 2 0 1 1 0 4h-.1a1 1 0 0 0-.9.6Z"/>
+        </svg>
+      </button>
     </div>
   </div>
 
-  <!-- 老師模式（受密碼保護） -->
-  <div class="card" id="panel-teacher">
+  <!-- 老師模式（預設隱藏） -->
+  <div class="card hidden" id="panel-teacher">
+    <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:6px">
+      <div class="sub">老師模式已解鎖（本分頁有效）。</div>
+      <button class="btn ghost" id="btnBackStudent">返回學員模式</button>
+    </div>
     <div class="row">
       <input id="filePicker" type="file" accept=".json,application/json,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
       <button class="btn" id="btnImport">匯入（JSON/Excel）</button>
@@ -98,26 +116,26 @@ textarea{width:100%;min-height:360px;border:1px solid var(--line);border-radius:
     </div>
   </div>
 
-  <!-- 學員模式（真正上課用） -->
-  <div class="card hidden" id="panel-student"></div>
+  <!-- 學員模式（預設顯示） -->
+  <div class="card" id="panel-student"></div>
 </div>
 
 <script>
 /* ====== 基本工具 ====== */
 const $=s=>document.querySelector(s);
 const isArray=Array.isArray;
-const storeKey='qs_bank_v33';
-const authKey='qs_teacher_ok_v33';
+const storeKey='qs_bank_v35';
+const authKey='qs_teacher_ok_v35';
 
-/* === 這裡設定老師模式的密碼（請自行修改） === */
-const TEACHER_PASSWORD = 'teacher123'; // ← 改成你的密碼
+/* === 老師模式密碼 === */
+const TEACHER_PASSWORD = 'teacher123';
 
 function normalize(a){ if(a==null) return []; return isArray(a)? [...a].sort((x,y)=>x-y) : [a]; }
 function same(a,b){ a=normalize(a); b=normalize(b); return a.length===b.length && a.every((v,i)=>v===b[i]); }
 function shuffle(arr){ return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]); }
 function download(filename, text){ const blob=new Blob([text],{type:'application/json;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; a.click(); URL.revokeObjectURL(a.href); }
 
-/* 預設題庫 */
+/* 預設題庫（無暫存時用） */
 const DEFAULT = [
   {"id":1,"section":"總說","question":"《大乘起信論》依什麼雙門立論以統攝教義？","options":["心真如門與心生滅門","空門與假門","因門與果門","性門與相門"],"answer":0,"explanation":"本論以「心真如門」「心生滅門」二門統攝一切法。"},
   {"id":2,"section":"總說","question":"本論所說「一心二門」中，生滅因依於何者而起？","options":["依於無明自體","依於如來藏真如","依於業力","依於阿賴耶識"],"answer":1,"explanation":"生滅門不離真如而起，喻如波依水。"},
@@ -126,42 +144,39 @@ const DEFAULT = [
 
 let BANK=[];
 
-/* ====== 啟動：載入本機或預設 ====== */
+/* ====== 啟動：預設學員模式、載入題庫 ====== */
 (function bootstrap(){
   const cached=localStorage.getItem(storeKey);
   if(cached){ try{ BANK=JSON.parse(cached);}catch{BANK=DEFAULT;} }
   else { BANK=DEFAULT; }
+
   $('#editor').value = JSON.stringify(BANK, null, 2);
+
+  // 掛載 UI（預覽與學生）
   mountStudent('#student-preview');
   mountStudent('#panel-student');
 
-  // 模式切換 + 密碼保護
-  document.querySelectorAll('input[name="role"]').forEach(r=>{
-    r.addEventListener('change',()=>{
-      const role=document.querySelector('input[name="role"]:checked').value;
-      if(role==='teacher'){
-        ensureTeacherAuth().then(ok=>{
-          if(ok){
-            $('#panel-teacher').classList.remove('hidden');
-            $('#panel-student').classList.add('hidden');
-            refreshStudent('#student-preview');
-          }else{
-            // 還原為學員模式
-            document.querySelector('input[name="role"][value="student"]').checked = true;
-            $('#panel-teacher').classList.add('hidden');
-            $('#panel-student').classList.remove('hidden');
-            refreshStudent('#panel-student');
-          }
-        });
-      }else{
-        $('#panel-teacher').classList.add('hidden');
-        $('#panel-student').classList.remove('hidden');
-        refreshStudent('#panel-student');
-      }
-    });
-  });
+  // 顯示狀態：預設 student
+  $('#panel-teacher').classList.add('hidden');
+  $('#panel-student').classList.remove('hidden');
 
-  // 老師端綁定
+  // 齒輪：密碼後顯示老師模式
+  $('#btnGear').onclick = async()=>{
+    const ok = await ensureTeacherAuth();
+    if(ok){
+      $('#panel-teacher').classList.remove('hidden');
+      $('#panel-student').classList.add('hidden');
+      refreshStudent('#student-preview');
+    }
+  };
+  // 老師模式中的「返回學員模式」
+  $('#btnBackStudent').onclick = ()=>{
+    $('#panel-teacher').classList.add('hidden');
+    $('#panel-student').classList.remove('hidden');
+    refreshStudent('#panel-student');
+  };
+
+  // 老師端操作綁定
   $('#btnImport').onclick = handleImport;
   $('#btnValidate').onclick = validateJSON;
   $('#btnApply').onclick = applyToPreview;
@@ -171,7 +186,7 @@ let BANK=[];
   $('#btnClearLocal').onclick = ()=>{ localStorage.removeItem(storeKey); alert('已清除 localStorage'); };
 })();
 
-/* ====== 老師模式密碼驗證（sessionStorage 單次分頁有效） ====== */
+/* ====== 密碼驗證（sessionStorage 單分頁有效） ====== */
 async function ensureTeacherAuth(){
   if(sessionStorage.getItem(authKey)==='1') return true;
   const pwd = prompt('請輸入老師模式密碼：');
@@ -230,7 +245,7 @@ function validateJSON(){
 function applyToPreview(){
   const arr=validateJSON(); if(!arr) return;
   BANK=arr; refreshStudent('#student-preview');
-  alert('已套用到預覽（右側學員區）。若要給學生用，切到「學員模式」。');
+  alert('已套用到預覽（右側學員區）。若要給學生用，直接切回學員模式。');
 }
 function saveLocal(){
   const arr=validateJSON(); if(!arr) return;
@@ -396,13 +411,11 @@ function showReport(root){
   const st=root._state;
   if(!st.paper.length){ alert('尚未開始作答'); return; }
 
-  // 統計
   const total = st.paper.length;
-  const answered = Object.keys(st.user).length; // 可能少於 total（多選未選滿不算判分但仍可列在報告）
+  const answered = Object.keys(st.user).length;
   const right = st.right;
   const acc = total ? Math.round(right/total*100) : 0;
 
-  // 錯題清單
   const wrongItems = [];
   st.paper.forEach(pi=>{
     const q=BANK[pi];
