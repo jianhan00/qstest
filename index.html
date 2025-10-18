@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>線上刷題小程序｜老師可編輯版 v3.5</title>
+<title>線上刷題小程序｜老師可編輯版 v3.6</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{
@@ -17,48 +17,57 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Ari
 h1{margin:0 0 8px;font-size:28px}
 .sub{color:var(--muted);font-size:13px}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-button,select,input[type="file"],input[type="number"]{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff;color:var(--ink);font-size:14px}
+button,select,input[type="file"],input[type="number"]{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;color:var(--ink);font-size:16px}
 button{cursor:pointer}
 .btn.brand{background:var(--brand);border-color:var(--brand);color:#fff}
 .btn.ghost{background:#fff}
 .btn.warn{background:#fde68a;border-color:#f59e0b}
 .btn.danger{background:#fee2e2;border-color:#ef4444}
-.badge{background:#f1f5f9;border:1px solid var(--line);border-radius:12px;padding:6px 10px;font-size:14px;margin-right:8px}
+.badge{background:#f1f5f9;border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:16px;margin-right:8px}
 .hr{height:1px;background:var(--line);margin:14px 0}
 .hidden{display:none}
 
 /* 齒輪按鈕（右上角） */
 .gear{
   display:inline-flex;align-items:center;justify-content:center;
-  width:36px;height:36px;border-radius:999px;border:1px solid var(--line);
+  width:40px;height:40px;border-radius:999px;border:1px solid var(--line);
   background:#fff;cursor:pointer;transition:box-shadow .15s,border-color .15s
 }
 .gear:hover{box-shadow:0 4px 12px rgba(15,23,42,.08);border-color:#c7d2fe}
-.gear svg{width:18px;height:18px}
+.gear svg{width:20px;height:20px}
 
-/* 題目/選項/回饋 */
-.question{font-size:20px;line-height:1.6;margin:6px 0 8px}
-.opt{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--line);border-radius:12px;padding:6px 8px;margin:3px 0;font-size:16px;line-height:1.4;background:#fff}
+/* 題目/選項/回饋（學員端字體放大） */
+.question{font-size:22px;line-height:1.7;margin:8px 0 10px}
+.opt{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin:4px 0;font-size:18px;line-height:1.5;background:#fff}
 .opt.correct{border-color:var(--ok)}
 .opt.wrong{border-color:var(--bad)}
-.feedback{margin-top:8px;border:1px solid var(--line);border-radius:10px;padding:8px;font-size:15px;background:#f8fafc}
+.feedback{margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:17px;background:#f8fafc}
 .feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)}
-.nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.nav{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
 
-/* 成績報告 */
-.report{margin-top:12px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:12px}
-.report h3{margin:0 0 8px}
-.report .meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
-.report .meta .chip{background:#f1f5f9;border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:14px}
-.report details{margin:6px 0}
-.report summary{cursor:pointer}
+/* 章節 chips */
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--line);background:#eef2ff;border-radius:999px;font-size:16px}
+.chip input{width:18px;height:18px}
 
-/* 老師編輯區 */
+/* 成績報告（放大） */
+.report{margin-top:14px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:14px}
+.report h3{margin:0 0 10px;font-size:20px}
+.report .meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.report .meta .chip{background:#f1f5f9;border:1px solid var(--line);border-radius:999px;padding:8px 12px;font-size:16px}
+.report details{margin:8px 0}
+.report summary{cursor:pointer;font-size:16px}
+
 .editor{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 textarea{width:100%;min-height:360px;border:1px solid var(--line);border-radius:12px;padding:10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;background:#fbfdff}
 .help{font-size:12px;color:var(--muted)}
 
-@media(max-width:980px){ .editor{grid-template-columns:1fr} h1{font-size:24px} .question{font-size:18px} .opt{font-size:15px} }
+@media(max-width:980px){
+  .editor{grid-template-columns:1fr}
+  h1{font-size:24px}
+  .question{font-size:22px}
+  .opt{font-size:18px}
+}
 </style>
 </head>
 <body>
@@ -67,11 +76,10 @@ textarea{width:100%;min-height:360px;border:1px solid var(--line);border-radius:
   <div class="card">
     <div class="row" style="justify-content:space-between;align-items:center">
       <div>
-        <h1>線上刷題小程序 <span class="sub">— 老師可編輯版 v3.5</span></h1>
+        <h1>線上刷題小程序 <span class="sub">— 老師可編輯版 v3.6</span></h1>
         <div class="sub">預設為學員模式；點右上角齒輪輸入密碼才能看到老師模式。</div>
       </div>
       <button id="btnGear" class="gear" title="老師模式">
-        <!-- 小齒輪 SVG -->
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <path stroke-width="2" d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/>
           <path stroke-width="2" d="M19.4 15a1 1 0 0 0 .2 1.1l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1 1 0 0 0-1.1-.2 1 1 0 0 0-.6.9V20a2 2 0 1 1-4 0v-.1a1 1 0 0 0-.6-.9 1 1 0 0 0-1.1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1 1 0 0 0 .2-1.1 1 1 0 0 0-.9-.6H4a2 2 0 1 1 0-4h.1a1 1 0 0 0 .9-.6 1 1 0 0 0-.2-1.1l-.1-.1A2 2 0 1 1 7.6 4.8l.1.1a1 1 0 0 0 1.1.2H9a1 1 0 0 0 .6-.9V4a2 2 0 1 1 4 0v.1a1 1 0 0 0 .6.9 1 1 0 0 0 1.1-.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1 1 0 0 0-.2 1.1 1 1 0 0 0 .9.6H20a2 2 0 1 1 0 4h-.1a1 1 0 0 0-.9.6Z"/>
@@ -124,10 +132,10 @@ textarea{width:100%;min-height:360px;border:1px solid var(--line);border-radius:
 /* ====== 基本工具 ====== */
 const $=s=>document.querySelector(s);
 const isArray=Array.isArray;
-const storeKey='qs_bank_v35';
-const authKey='qs_teacher_ok_v35';
+const storeKey='qs_bank_v36';
+const authKey='qs_teacher_ok_v36';
 
-/* === 老師模式密碼 === */
+/* 老師模式密碼（可自行更改） */
 const TEACHER_PASSWORD = 'teacher123';
 
 function normalize(a){ if(a==null) return []; return isArray(a)? [...a].sort((x,y)=>x-y) : [a]; }
@@ -262,7 +270,7 @@ function loadLocal(){
   }catch{ alert('讀取失敗：本機資料格式不正確'); }
 }
 
-/* ====== 學員 UI（含成績報告） ====== */
+/* ====== 學員 UI（含章節篩選＋成績報告） ====== */
 function mountStudent(selector){
   const el=$(selector);
   el.innerHTML=`
@@ -271,6 +279,12 @@ function mountStudent(selector){
       <div class="badge">目前：<b class="s-progress">0/0</b></div>
       <div class="badge">已答對：<b class="s-right">0</b></div>
     </div>
+
+    <div class="row">
+      <div style="font-size:16px">章節：</div>
+      <div class="chips s-sections"></div>
+    </div>
+
     <div class="row">
       <label>模式</label>
       <select class="s-mode"><option value="order">依順序</option><option value="shuffle">隨機</option></select>
@@ -280,6 +294,7 @@ function mountStudent(selector){
       <button class="btn ghost s-reset">重置</button>
       <button class="btn warn s-finish" disabled>完成並看成績</button>
     </div>
+
     <div class="hr"></div>
     <div class="question s-q"></div>
     <div class="s-optBox"></div>
@@ -298,6 +313,9 @@ function mountStudent(selector){
   const state={paper:[], idx:0, right:0, user:{}, revealed:{}, firstScored:{}};
   el._state=state;
 
+  // 章節 chips
+  renderSections(el);
+
   el.querySelector('.s-total').textContent=BANK.length;
   adjustCount(el);
 
@@ -308,24 +326,42 @@ function mountStudent(selector){
   el.querySelector('.s-finish').onclick=()=>showReport(el);
 }
 function refreshStudent(selector){ mountStudent(selector); }
+
+function renderSections(root){
+  const secs=[...new Set(BANK.map(q=>q.section||'未分類'))];
+  const box=root.querySelector('.s-sections');
+  box.innerHTML = secs.map(s=>`
+    <label class="chip">
+      <input type="checkbox" value="${s}" checked>
+      ${s}
+    </label>`).join('');
+}
+
 function adjustCount(root){
   const n=BANK.length;
   root.querySelectorAll('.s-count option').forEach(o=>{ if(o.value==='all') return; o.disabled=parseInt(o.value,10)>n; });
 }
+
 function start(root){
   const st=root._state;
   const mode=root.querySelector('.s-mode').value;
   const wantStr=root.querySelector('.s-count').value;
-  let list=BANK.map((_,i)=>i);
-  if(mode==='shuffle') list=shuffle(list);
+  const chosen = [...root.querySelectorAll('.s-sections input:checked')].map(i=>i.value);
+  if(chosen.length===0){ alert('請至少勾選一個章節'); return; }
+  const poolIdx = BANK.map((q,i)=>({q,i})).filter(x=>chosen.includes(x.q.section||'未分類')).map(x=>x.i);
+  if(poolIdx.length===0){ alert('所選章節目前沒有題目'); return; }
+
+  let list = (mode==='shuffle') ? shuffle(poolIdx) : poolIdx;
   const want=wantStr==='all'? list.length : Math.min(parseInt(wantStr,10), list.length);
   st.paper=list.slice(0, want);
   st.idx=0; st.right=0; st.user={}; st.revealed={}; st.firstScored={};
+
   root.querySelector('.s-fb').style.display='none';
   root.querySelector('.s-report').classList.add('hidden');
   root.querySelector('.s-finish').disabled=false;
   render(root);
 }
+
 function reset(root){
   const st=root._state; st.paper=[]; st.idx=0; st.right=0; st.user={}; st.revealed={}; st.firstScored={};
   root.querySelector('.s-progress').textContent='0/0';
@@ -336,6 +372,7 @@ function reset(root){
   root.querySelector('.s-report').classList.add('hidden');
   root.querySelector('.s-finish').disabled=true;
 }
+
 function render(root){
   const st=root._state;
   const q=BANK[st.paper[st.idx]]; if(!q) return;
@@ -382,6 +419,7 @@ function render(root){
   if(st.revealed[q.id]){ showFB(root, q, same(st.user[q.id], q.answer)); colorize(root, q); }
   else { hideFB(root); colorize(root, q, false); }
 }
+
 function colorize(root, q, show=true){
   const correct=normalize(q.answer);
   const box=root.querySelector('.s-optBox');
@@ -396,6 +434,7 @@ function colorize(root, q, show=true){
     }
   });
 }
+
 function showFB(root, q, ok){
   const fb=root.querySelector('.s-fb'); fb.style.display='block';
   fb.classList.toggle('ok', ok); fb.classList.toggle('bad', !ok);
@@ -447,8 +486,8 @@ function showReport(root){
         `<details open>
           <summary>錯題清單（${wrongItems.length} 題）</summary>
           <ol>${wrongItems.map(w=>`
-            <li style="margin:6px 0">
-              <div><b>${w.question}</b></div>
+            <li style="margin:8px 0">
+              <div style="font-size:16px"><b>${w.question}</b></div>
               <div class="sub">你的作答：${w.your}；正解：${w.ans}</div>
               <div class="sub">${w.exp ? '解析：'+w.exp : ''}</div>
             </li>`).join('')}</ol>
