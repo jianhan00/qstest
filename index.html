@@ -1,97 +1,109 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>線上刷題小程序｜雲端唯讀版 v4.1</title>
-  <style>
-    :root{ --bg:#f6f7fb; --card:#ffffff; --ink:#0f172a; --muted:#64748b; --brand:#3b82f6; --ok:#16a34a; --bad:#ef4444; --line:#e5e7eb; }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,"Noto Sans TC",sans-serif;background:var(--bg);color:var(--ink)}
-    .wrap{max-width:1000px;margin:24px auto;padding:0 16px}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 10px 30px rgba(15,23,42,.06);padding:18px}
-    h1{margin:0 0 8px;font-size:28px}
-    .sub{color:var(--muted);font-size:13px}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    button,select{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;color:var(--ink);font-size:16px;cursor:pointer}
-    .btn.brand{background:var(--brand);border-color:var(--brand);color:#fff}
-    .btn.ghost{background:#fff}
-    .badge{background:#f1f5f9;border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:16px;margin-right:8px}
-    .hr{height:1px;background:var(--line);margin:14px 0}
-    .question{font-size:22px;line-height:1.7;margin:8px 0 10px}
-    .opt{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin:4px 0;font-size:18px;line-height:1.5;background:#fff}
-    .opt.correct{border-color:var(--ok)}
-    .opt.wrong{border-color:var(--bad)}
-    .feedback{margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:17px;background:#f8fafc}
-    .feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)}
-    .nav{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-    .chips{display:flex;gap:10px;flex-wrap:wrap}
-    .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--line);background:#eef2ff;border-radius:999px;font-size:16px}
-    .chip input{width:18px;height:18px}
-    .report{margin-top:14px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:14px}
-    .report h3{margin:0 0 10px;font-size:20px}
-    .report .meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
-    .report .meta .chip{background:#f1f5f9;border:1px solid var(--line);border-radius:999px;padding:8px 12px;font-size:16px}
-    .report details{margin:8px 0}
-    .report summary{cursor:pointer;font-size:16px}
-    @media(max-width:980px){ h1{font-size:24px} .question{font-size:22px} .opt{font-size:18px} }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>線上刷題小程序｜雲端唯讀版</title>
+<style>
+:root{
+  --bg:#f6f7fb; --card:#ffffff; --ink:#0f172a; --muted:#64748b;
+  --brand:#3b82f6; --ok:#16a34a; --bad:#ef4444; --line:#e5e7eb;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,"Noto Sans TC",sans-serif;background:var(--bg);color:var(--ink)}
+.wrap{max-width:1000px;margin:24px auto;padding:0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 10px 30px rgba(15,23,42,.06);padding:18px}
+h1{margin:0 0 8px;font-size:28px}
+.sub{color:var(--muted);font-size:13px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+button,select{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;color:var(--ink);font-size:16px;cursor:pointer}
+.btn.brand{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.ghost{background:#fff}
+.badge{background:#f1f5f9;border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:16px;margin-right:8px}
+.hr{height:1px;background:var(--line);margin:14px 0}
+
+.question{font-size:22px;line-height:1.7;margin:8px 0 10px}
+.opt{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin:4px 0;font-size:18px;line-height:1.5;background:#fff}
+.opt.correct{border-color:var(--ok)}
+.opt.wrong{border-color:var(--bad)}
+
+.feedback{margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:17px;background:#f8fafc}
+.feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)}
+.nav{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--line);background:#eef2ff;border-radius:999px;font-size:16px}
+.chip input{width:18px;height:18px}
+
+.report{margin-top:14px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:14px}
+.report h3{margin:0 0 10px;font-size:20px}
+.report .meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.report .meta .chip{background:#f1f5f9;border:1px solid var(--line);border-radius:999px;padding:8px 12px;font-size:16px}
+.report details{margin:8px 0}
+.report summary{cursor:pointer;font-size:16px}
+
+@media(max-width:980px){ h1{font-size:24px} .question{font-size:22px} .opt{font-size:18px} }
+</style>
 </head>
 <body>
 <div class="wrap">
+  <!-- 頂部：只顯示雲端狀態 -->
   <div class="card">
     <div class="row" style="justify-content:space-between;align-items:center">
       <div>
-        <h1>線上刷題小程序 <span class="sub">— 雲端唯讀版 v4.1</span></h1>
-        <div class="sub">本頁面會自動從雲端載入最新題庫（每 60 秒檢查一次），也可手動重新載入。</div>
+        <h1>線上刷題小程序 <span class="sub">— 雲端唯讀版</span></h1>
         <div class="sub" id="cloudStatus">雲端：尚未連線</div>
       </div>
-      <button class="btn ghost" id="btnRefresh">重新載入雲端</button>
     </div>
   </div>
+
+  <!-- 學員模式 -->
   <div class="card" id="panel-student"></div>
 </div>
 
 <script>
-/* ====== 雲端唯讀端點（替換成你的 GAS /exec） ====== */
+/* ====== 雲端唯讀端點（保留你的變數與ID） ====== */
 const DEPLOYMENT_URL = 'https://script.google.com/macros/s/AKfycbwLAz4YXqDobEGIC43cN_qCcqevnODBPXIn70lfanCrDBHPIvaxkMD2_vRma8tBBiTU_A/exec';
 
 /* ====== 工具 ====== */
-const $=s=>document.querySelector(s); const isArray=Array.isArray;
+const $ = s=>document.querySelector(s); const isArray=Array.isArray;
 function normalize(a){ if(a==null) return []; return isArray(a)? [...a].sort((x,y)=>x-y) : [a]; }
 function same(a,b){ a=normalize(a); b=normalize(b); return a.length===b.length && a.every((v,i)=>v===b[i]); }
 function shuffle(arr){ return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]); }
 function setCloudStatus(msg){ $('#cloudStatus').textContent='雲端：'+msg; }
-function hash(s){ let h=0,i=0,len=s.length; while(i<len){ h=((h<<5)-h)+s.charCodeAt(i++)|0; } return h; }
 
-/* ====== 狀態 ====== */
-let BANK=[];
-
-/* ====== 讀取雲端 ====== */
-async function pullFromCloud(){
+/* ====== 題庫（啟動時讀一次，不自動輪詢） ====== */
+let BANK = [];
+async function loadCloudOnce(){
   try{
-    const res=await fetch(DEPLOYMENT_URL,{method:'GET'});
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const obj=await res.json();
-    if(!Array.isArray(obj.bank)) throw new Error('格式錯誤');
-    setCloudStatus('已連線（更新時間：'+(obj.updatedAt||'未知')+'）');
-    return obj.bank;
-  }catch(e){ setCloudStatus('連線失敗：'+e.message); return null; }
+    setCloudStatus('連線中…');
+    const res = await fetch(DEPLOYMENT_URL, {cache:'no-store'});
+    const j = await res.json();
+    BANK = Array.isArray(j.bank) ? j.bank : [];
+    setCloudStatus(`已連線（更新時間：${j.updatedAt||'-'}）`);
+  }catch(e){
+    setCloudStatus('連線失敗');
+    BANK = [];
+  }
+  refreshStudent('#panel-student');
 }
+loadCloudOnce();
 
 /* ====== 學員 UI ====== */
 function mountStudent(selector){
-  const el=$(selector);
-  el.innerHTML=`
+  const el = $(selector);
+  el.innerHTML = `
     <div class="row">
       <div class="badge">共 <b class="s-total">0</b> 題</div>
       <div class="badge">目前：<b class="s-progress">0/0</b></div>
       <div class="badge">已答對：<b class="s-right">0</b></div>
     </div>
+
     <div class="row">
       <div style="font-size:16px">章節：</div>
       <div class="chips s-sections"></div>
     </div>
+
     <div class="row">
       <label>模式</label>
       <select class="s-mode"><option value="order">依順序</option><option value="shuffle">隨機</option></select>
@@ -99,8 +111,9 @@ function mountStudent(selector){
       <select class="s-count"><option value="all">全部</option><option>5</option><option selected>10</option><option>20</option><option>50</option></select>
       <button class="btn brand s-start">開始作答</button>
       <button class="btn ghost s-reset">重置</button>
-      <button class="btn" disabled style="opacity:.5">（本頁不提供老師寫入）</button>
+      <button class="btn warn s-finish" disabled>完成並看成績</button>
     </div>
+
     <div class="hr"></div>
     <div class="question s-q"></div>
     <div class="s-optBox"></div>
@@ -113,30 +126,60 @@ function mountStudent(selector){
       <button class="btn s-prev">← 上一題</button>
       <button class="btn s-next">下一題 →</button>
     </div>
-    <div class="report hidden s-report"></div>`;
-  const state={paper:[], idx:0, right:0, user:{}, revealed:{}, firstScored:{}}; el._state=state;
-  renderSections(el); el.querySelector('.s-total').textContent=BANK.length; adjustCount(el);
-  el.querySelector('.s-start').onclick=()=>start(el);
-  el.querySelector('.s-reset').onclick=()=>reset(el);
-  el.querySelector('.s-prev').onclick=()=>{ if(state.idx>0){state.idx--; render(el);} };
-  el.querySelector('.s-next').onclick=()=>{ if(state.idx<state.paper.length-1){state.idx++; render(el);} };
-  el.querySelector('.s-finish')?.addEventListener('click',()=>showReport(el));
+    <div class="report hidden s-report"></div>
+  `;
+
+  const state={paper:[], idx:0, right:0, user:{}, revealed:{}, firstScored:{}};
+  el._state = state;
+
+  renderSections(el);
+  el.querySelector('.s-total').textContent = BANK.length;
+  adjustCount(el);
+
+  el.querySelector('.s-start').onclick = ()=>start(el);
+  el.querySelector('.s-reset').onclick = ()=>reset(el);
+  el.querySelector('.s-prev').onclick = ()=>{ if(state.idx>0){state.idx--; render(el);} };
+  el.querySelector('.s-next').onclick = ()=>{ if(state.idx<state.paper.length-1){state.idx++; render(el);} };
+  el.querySelector('.s-finish').onclick = ()=>showReport(el);
 }
+
 function refreshStudent(selector){ mountStudent(selector); }
-function renderSections(root){ const secs=[...new Set(BANK.map(q=>q.section||'未分類'))]; const box=root.querySelector('.s-sections'); box.innerHTML=secs.map(s=>`<label class="chip"><input type="checkbox" value="${s}" checked> ${s}</label>`).join(''); }
-function adjustCount(root){ const n=BANK.length; root.querySelectorAll('.s-count option').forEach(o=>{ if(o.value==='all') return; o.disabled=parseInt(o.value,10)>n; }); }
+
+function renderSections(root){
+  const secs=[...new Set(BANK.map(q=>q.section||'未分類'))];
+  const box=root.querySelector('.s-sections');
+  box.innerHTML = secs.map(s=>`
+    <label class="chip">
+      <input type="checkbox" value="${s}" checked>
+      ${s}
+    </label>`).join('');
+}
+
+function adjustCount(root){
+  const n=BANK.length;
+  root.querySelectorAll('.s-count option').forEach(o=>{ if(o.value==='all') return; o.disabled=parseInt(o.value,10)>n; });
+}
+
 function start(root){
-  const st=root._state; const mode=root.querySelector('.s-mode').value; const wantStr=root.querySelector('.s-count').value;
-  const chosen=[...root.querySelectorAll('.s-sections input:checked')].map(i=>i.value);
+  const st=root._state;
+  const mode=root.querySelector('.s-mode').value;
+  const wantStr=root.querySelector('.s-count').value;
+  const chosen = [...root.querySelectorAll('.s-sections input:checked')].map(i=>i.value);
   if(chosen.length===0){ alert('請至少勾選一個章節'); return; }
-  const poolIdx=BANK.map((q,i)=>({q,i})).filter(x=>chosen.includes(x.q.section||'未分類')).map(x=>x.i);
+  const poolIdx = BANK.map((q,i)=>({q,i})).filter(x=>chosen.includes(x.q.section||'未分類')).map(x=>x.i);
   if(poolIdx.length===0){ alert('所選章節目前沒有題目'); return; }
-  let list=(mode==='shuffle')?shuffle(poolIdx):poolIdx;
-  const want=wantStr==='all'?list.length:Math.min(parseInt(wantStr,10),list.length);
-  st.paper=list.slice(0,want); st.idx=0; st.right=0; st.user={}; st.revealed={}; st.firstScored={};
-  root.querySelector('.s-fb').style.display='none'; root.querySelector('.s-report').classList.add('hidden');
+
+  let list = (mode==='shuffle') ? shuffle(poolIdx) : poolIdx;
+  const want=wantStr==='all'? list.length : Math.min(parseInt(wantStr,10), list.length);
+  st.paper=list.slice(0, want);
+  st.idx=0; st.right=0; st.user={}; st.revealed={}; st.firstScored={};
+
+  root.querySelector('.s-fb').style.display='none';
+  root.querySelector('.s-report').classList.add('hidden');
+  root.querySelector('.s-finish').disabled=false;
   render(root);
 }
+
 function reset(root){
   const st=root._state; st.paper=[]; st.idx=0; st.right=0; st.user={}; st.revealed={}; st.firstScored={};
   root.querySelector('.s-progress').textContent='0/0';
@@ -145,71 +188,136 @@ function reset(root){
   root.querySelector('.s-optBox').innerHTML='';
   root.querySelector('.s-fb').style.display='none';
   root.querySelector('.s-report').classList.add('hidden');
+  root.querySelector('.s-finish').disabled=true;
 }
+
 function render(root){
-  const st=root._state; const q=BANK[st.paper[st.idx]]; if(!q) return;
+  const st=root._state;
+  const q=BANK[st.paper[st.idx]]; if(!q) return;
   root.querySelector('.s-progress').textContent=`${st.idx+1}/${st.paper.length}`;
   root.querySelector('.s-right').textContent=st.right;
-  root.querySelector('.s-q').textContent=q.question||'';
+  root.querySelector('.s-q').textContent=q.question || '';
+
   const box=root.querySelector('.s-optBox'); box.innerHTML='';
-  const correct=normalize(q.answer); const isMulti=correct.length>1; const cur=normalize(st.user[q.id]);
+  const correct=normalize(q.answer);
+  const isMulti=correct.length>1;
+  const cur=normalize(st.user[q.id]);
+
+  const group='opt_'+q.id; // 每題獨立群組
+
   (q.options||[]).forEach((opt,i)=>{
     const row=document.createElement('label'); row.className='opt';
-    const ip=document.createElement('input'); ip.type=isMulti?'checkbox':'radio'; ip.name='opt'; ip.value=i;
-    if(isMulti && cur.includes(i)) ip.checked=true; if(!isMulti && cur[0]===i) ip.checked=true;
+    const ip=document.createElement('input'); ip.type=isMulti?'checkbox':'radio'; ip.name=group; ip.value=i;
+
+    // ✅ 回題仍顯示之前選擇（帶出作答）
+    if(isMulti && cur.includes(i)) ip.checked=true;
+    if(!isMulti && cur[0]===i) ip.checked=true;
+
     row.addEventListener('click',(e)=>{
       if(e.target.tagName.toLowerCase()!=='input'){ ip.checked=!ip.checked; }
       if(isMulti){
-        const now=new Set(normalize(st.user[q.id])); if(ip.checked) now.add(i); else now.delete(i);
+        const now=new Set(normalize(st.user[q.id]));
+        if(ip.checked) now.add(i); else now.delete(i);
         st.user[q.id]=[...now].sort((a,b)=>a-b);
         if(st.user[q.id].length===correct.length){
-          const right=same(st.user[q.id],q.answer); st.revealed[q.id]=true; showFB(root,q,right); colorize(root,q);
-          if(right && !st.firstScored[q.id]){ st.right++; st.firstScored[q.id]=true; }
-        }else{ st.revealed[q.id]=false; hideFB(root); colorize(root,q,false); }
+          const right=same(st.user[q.id], q.answer);
+          if(!st.firstScored[q.id]){ if(right) st.right++; st.firstScored[q.id]=true; }
+          st.revealed[q.id]=true; showFB(root, q, right); colorize(root, q);
+        }else{
+          st.revealed[q.id]=false; hideFB(root); colorize(root, q, false);
+        }
       }else{
-        st.user[q.id]=i; const right=(i===correct[0]); st.revealed[q.id]=true; showFB(root,q,right); colorize(root,q);
-        if(right && !st.firstScored[q.id]){ st.right++; st.firstScored[q.id]=true; }
+        st.user[q.id]=i;
+        const right=(i===correct[0]);
+        if(!st.firstScored[q.id]){ if(right) st.right++; st.firstScored[q.id]=true; }
+        st.revealed[q.id]=true; showFB(root, q, right); colorize(root, q);
       }
     });
+
     const text=document.createElement('div'); text.innerHTML=`<b>${String.fromCharCode(65+i)}.</b> ${opt}`;
     row.appendChild(ip); row.appendChild(text); box.appendChild(row);
   });
-  if(st.revealed[q.id]){ showFB(root,q,same(st.user[q.id],q.answer)); colorize(root,q); }
-  else { hideFB(root); colorize(root,q,false); }
-}
-function colorize(root,q,show=true){
-  const correct=normalize(q.answer); const box=root.querySelector('.s-optBox');
-  box.querySelectorAll('.opt').forEach((row,i)=>{
-    row.classList.remove('correct','wrong');
-    if(show){ if(correct.includes(i)) row.classList.add('correct'); else{ const cur=normalize(root._state.user[q.id]); if(cur.includes(i)) row.classList.add('wrong'); } }
-  });
-}
-function showFB(root,q,ok){
-  const fb=root.querySelector('.s-fb'); fb.style.display='block';
-  fb.classList.toggle('ok',ok); fb.classList.toggle('bad',!ok);
-  const label=normalize(q.answer).map(i=>String.fromCharCode(65+i)).join(', ');
-  root.querySelector('.s-fbTitle').textContent= ok ? '答對了 ✅' : '答錯了 ❌';
-  root.querySelector('.s-fbAns').textContent='正確答案：'+label;
-  root.querySelector('.s-fbExp').textContent=q.explanation ? ('解析：'+q.explanation) : '（此題暫無解析）';
-}
-function hideFB(root){ root.querySelector('.s-fb').style.display='none'; }
-function showReport(root){
-  const st=root._state; if(!st.paper.length){ alert('尚未開始作答'); return; }
-  const total=st.paper.length; const answered=Object.keys(st.user).length; const right=st.right; const acc= total ? Math.round(right/total*100):0;
-  const wrongItems=[]; st.paper.forEach(pi=>{ const q=BANK[pi]; const cur=normalize(st.user[q.id]); const ok=same(cur,q.answer);
-    if(!ok){ wrongItems.push({ id:q.id, question:q.question, your:cur.map(i=>String.fromCharCode(65+i)).join(', ')||'（未作答或未選滿）', ans:normalize(q.answer).map(i=>String.fromCharCode(65+i)).join(', '), exp:q.explanation||'' }); }
-  });
-  const box=root.querySelector('.s-report'); box.classList.remove('hidden');
-  box.innerHTML=`<div class="report"><h3>成績報告</h3><div class="meta"><span class="chip">題數：<b>${total}</b></span><span class="chip">作答：<b>${answered}</b></span><span class="chip">答對：<b>${right}</b></span><span class="chip">正確率：<b>${acc}%</b></span></div>${wrongItems.length===0?'<p>太強了！本次無錯題 🎉</p>':`<details open><summary>錯題清單（${wrongItems.length} 題）</summary><ol>${wrongItems.map(w=>`<li style="margin:8px 0"><div style="font-size:16px"><b>${w.question}</b></div><div class="sub">你的作答：${w.your}；正解：${w.ans}</div><div class="sub">${w.exp ? '解析：'+w.exp : ''}</div></li>`).join('')}</ol></details>`}</div>`;
+
+  if(st.revealed[q.id]){ showFB(root, q, same(st.user[q.id], q.answer)); colorize(root, q); }
+  else { hideFB(root); colorize(root, q, false); }
 }
 
-/* ====== 啟動 ====== */
-(async function(){
-  $('#btnRefresh').onclick=async()=>{ const cloud=await pullFromCloud(); if(cloud){ BANK=cloud; refreshStudent('#panel-student'); alert('已載入雲端最新題庫'); } };
-  const cloud=await pullFromCloud(); if(cloud){ BANK=cloud; }
-  refreshStudent('#panel-student');
-  setInterval(async()=>{ const cloud=await pullFromCloud(); if(cloud){ const localHash=hash(JSON.stringify(BANK)); const cloudHash=hash(JSON.stringify(cloud)); if(localHash!==cloudHash){ BANK=cloud; refreshStudent('#panel-student'); } } }, 60000);
-})();
+function colorize(root, q, show=true){
+  const correct=normalize(q.answer);
+  const box=root.querySelector('.s-optBox');
+  box.querySelectorAll('.opt').forEach((row,i)=>{
+    row.classList.remove('correct','wrong');
+    if(show){
+      if(correct.includes(i)) row.classList.add('correct');
+      else{
+        const cur=normalize(root._state.user[q.id]);
+        if(cur.includes(i)) row.classList.add('wrong');
+      }
+    }
+  });
+}
+
+function showFB(root, q, ok){
+  const fb=root.querySelector('.s-fb'); fb.style.display='block';
+  fb.classList.toggle('ok', ok); fb.classList.toggle('bad', !ok);
+  root.querySelector('.s-fbTitle').textContent = ok ? '答對了 ✅' : '答錯了 ❌';
+  const label=normalize(q.answer).map(i=>String.fromCharCode(65+i)).join(', ');
+  root.querySelector('.s-fbAns').textContent = `正確答案：${label}`;
+  root.querySelector('.s-fbExp').textContent = q.explanation ? `解析：${q.explanation}` : '（此題暫無解析）';
+}
+function hideFB(root){ root.querySelector('.s-fb').style.display='none'; }
+
+/* ====== 成績報告 ====== */
+function showReport(root){
+  const st=root._state;
+  if(!st.paper.length){ alert('尚未開始作答'); return; }
+
+  const total = st.paper.length;
+  const answered = Object.keys(st.user).length;
+  const right = st.right;
+  const acc = total ? Math.round(right/total*100) : 0;
+
+  const wrongItems = [];
+  st.paper.forEach(pi=>{
+    const q=BANK[pi];
+    const cur=normalize(st.user[q.id]);
+    const ok=same(cur, q.answer);
+    if(!ok){
+      wrongItems.push({
+        id:q.id,
+        question:q.question,
+        your: cur.map(i=>String.fromCharCode(65+i)).join(', ') || '（未作答或未選滿）',
+        ans: normalize(q.answer).map(i=>String.fromCharCode(65+i)).join(', '),
+        exp: q.explanation||''
+      });
+    }
+  });
+
+  const box=root.querySelector('.s-report');
+  box.classList.remove('hidden');
+  box.innerHTML = `
+    <div class="report">
+      <h3>成績報告</h3>
+      <div class="meta">
+        <span class="chip">題數：<b>${total}</b></span>
+        <span class="chip">作答：<b>${answered}</b></span>
+        <span class="chip">答對：<b>${right}</b></span>
+        <span class="chip">正確率：<b>${acc}%</b></span>
+      </div>
+      ${wrongItems.length===0 ? '<p>太強了！本次無錯題 🎉</p>' :
+        `<details open>
+          <summary>錯題清單（${wrongItems.length} 題）</summary>
+          <ol>${wrongItems.map(w=>`
+            <li style="margin:6px 0">
+              <div><b>${w.question}</b></div>
+              <div class="sub">你的作答：${w.your}；正解：${w.ans}</div>
+              <div class="sub">${w.exp ? '解析：'+w.exp : ''}</div>
+            </li>`).join('')}</ol>
+        </details>`
+      }
+    </div>
+  `;
+}
 </script>
 </body>
 </html>
