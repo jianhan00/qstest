@@ -62,7 +62,7 @@ button,select{border:1px solid var(--line);border-radius:10px;padding:10px 12px;
 </div>
 
 <script>
-/* ====== 雲端唯讀端點（保留你的變數與ID） ====== */
+/* ====== 雲端唯讀端點（請只替換字串，勿改變變數名稱） ====== */
 const DEPLOYMENT_URL = 'https://script.google.com/macros/s/AKfycbwLAz4YXqDobEGIC43cN_qCcqevnODBPXIn70lfanCrDBHPIvaxkMD2_vRma8tBBiTU_A/exec';
 
 /* ====== 工具 ====== */
@@ -139,7 +139,16 @@ function mountStudent(selector){
   el.querySelector('.s-start').onclick = ()=>start(el);
   el.querySelector('.s-reset').onclick = ()=>reset(el);
   el.querySelector('.s-prev').onclick = ()=>{ if(state.idx>0){state.idx--; render(el);} };
-  el.querySelector('.s-next').onclick = ()=>{ if(state.idx<state.paper.length-1){state.idx++; render(el);} };
+  // ✅ 最後一題再按「下一題」：提示完成並顯示成績
+  el.querySelector('.s-next').onclick = ()=>{
+    if(state.idx < state.paper.length - 1){
+      state.idx++;
+      render(el);
+    }else{
+      alert('本次練習已完成 🎉');
+      showReport(el);
+    }
+  };
   el.querySelector('.s-finish').onclick = ()=>showReport(el);
 }
 
@@ -193,7 +202,9 @@ function reset(root){
 
 function render(root){
   const st=root._state;
-  const q=BANK[st.paper[st.idx]]; if(!q) return;
+  const pi = st.paper[st.idx];          // ✅ 本輪索引（唯一，避免題庫 id 重複）
+  const q  = BANK[pi]; if(!q) return;
+
   root.querySelector('.s-progress').textContent=`${st.idx+1}/${st.paper.length}`;
   root.querySelector('.s-right').textContent=st.right;
   root.querySelector('.s-q').textContent=q.question || '';
@@ -201,36 +212,35 @@ function render(root){
   const box=root.querySelector('.s-optBox'); box.innerHTML='';
   const correct=normalize(q.answer);
   const isMulti=correct.length>1;
-  const cur=normalize(st.user[q.id]);
-
-  const group='opt_'+q.id; // 每題獨立群組
+  const cur=normalize(st.user[pi]);     // ✅ 用 pi 存取作答
+  const group='opt_'+pi;                // ✅ 每題獨立群組
 
   (q.options||[]).forEach((opt,i)=>{
     const row=document.createElement('label'); row.className='opt';
     const ip=document.createElement('input'); ip.type=isMulti?'checkbox':'radio'; ip.name=group; ip.value=i;
 
-    // ✅ 回題仍顯示之前選擇（帶出作答）
+    // 回題仍顯示之前選擇（帶出作答）
     if(isMulti && cur.includes(i)) ip.checked=true;
-    if(!isMulti && cur[0]===i) ip.checked=true;
+    if(!isMulti && cur[0]===i)     ip.checked=true;
 
     row.addEventListener('click',(e)=>{
       if(e.target.tagName.toLowerCase()!=='input'){ ip.checked=!ip.checked; }
       if(isMulti){
-        const now=new Set(normalize(st.user[q.id]));
+        const now=new Set(normalize(st.user[pi]));
         if(ip.checked) now.add(i); else now.delete(i);
-        st.user[q.id]=[...now].sort((a,b)=>a-b);
-        if(st.user[q.id].length===correct.length){
-          const right=same(st.user[q.id], q.answer);
-          if(!st.firstScored[q.id]){ if(right) st.right++; st.firstScored[q.id]=true; }
-          st.revealed[q.id]=true; showFB(root, q, right); colorize(root, q);
+        st.user[pi]=[...now].sort((a,b)=>a-b);
+        if(st.user[pi].length===correct.length){
+          const right=same(st.user[pi], q.answer);
+          if(!st.firstScored[pi]){ if(right) st.right++; st.firstScored[pi]=true; }
+          st.revealed[pi]=true; showFB(root, q, right); colorize(root, q, pi);
         }else{
-          st.revealed[q.id]=false; hideFB(root); colorize(root, q, false);
+          st.revealed[pi]=false; hideFB(root); colorize(root, q, pi, false);
         }
       }else{
-        st.user[q.id]=i;
+        st.user[pi]=i;
         const right=(i===correct[0]);
-        if(!st.firstScored[q.id]){ if(right) st.right++; st.firstScored[q.id]=true; }
-        st.revealed[q.id]=true; showFB(root, q, right); colorize(root, q);
+        if(!st.firstScored[pi]){ if(right) st.right++; st.firstScored[pi]=true; }
+        st.revealed[pi]=true; showFB(root, q, right); colorize(root, q, pi);
       }
     });
 
@@ -238,11 +248,11 @@ function render(root){
     row.appendChild(ip); row.appendChild(text); box.appendChild(row);
   });
 
-  if(st.revealed[q.id]){ showFB(root, q, same(st.user[q.id], q.answer)); colorize(root, q); }
-  else { hideFB(root); colorize(root, q, false); }
+  if(st.revealed[pi]){ showFB(root, q, same(st.user[pi], q.answer)); colorize(root, q, pi); }
+  else { hideFB(root); colorize(root, q, pi, false); }
 }
 
-function colorize(root, q, show=true){
+function colorize(root, q, pi, show=true){
   const correct=normalize(q.answer);
   const box=root.querySelector('.s-optBox');
   box.querySelectorAll('.opt').forEach((row,i)=>{
@@ -250,7 +260,7 @@ function colorize(root, q, show=true){
     if(show){
       if(correct.includes(i)) row.classList.add('correct');
       else{
-        const cur=normalize(root._state.user[q.id]);
+        const cur=normalize(root._state.user[pi]);
         if(cur.includes(i)) row.classList.add('wrong');
       }
     }
@@ -280,7 +290,7 @@ function showReport(root){
   const wrongItems = [];
   st.paper.forEach(pi=>{
     const q=BANK[pi];
-    const cur=normalize(st.user[q.id]);
+    const cur=normalize(st.user[pi]);
     const ok=same(cur, q.answer);
     if(!ok){
       wrongItems.push({
